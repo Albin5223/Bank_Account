@@ -9,7 +9,7 @@ public class SavingsAccount extends BankAccount{
     protected double depositCap;
 
     /**
-    * Cette classe représent un livret d'épargne sans autorisation de plafond et possédant un plafond
+    * Cette classe représente un livret d'épargne sans autorisation de plafond et possédant un plafond
     * <p>
     * @param number est le numéro du compte
     * @param balance est le solde de départ du compte

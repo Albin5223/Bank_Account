@@ -1,2 +1,35 @@
+# Fusion root + bank-account/.gitignore (adapté pour la racine)
+
+### IDE ###
 /.idea/
 *.iml
+.vscode/
+
+### Maven / Java ###
+**/target/
+**/build/
+**/.mvn/wrapper/maven-wrapper.jar
+**/HELP.md
+
+### STS / Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ ###
+*.iws
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+##Autres 
+ARCHITECTURE.md
