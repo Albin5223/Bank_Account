@@ -9,15 +9,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import fr.albin.bank_account.domain.exception.InvalidAmountException;
-import fr.albin.bank_account.domain.exception.InsufficientBalanceException;
 import fr.albin.bank_account.domain.exception.OverdraftLimitExceededException;
 import fr.albin.bank_account.domain.model.enums.TypeAccount;
 import fr.albin.bank_account.domain.model.enums.TypeOperation;
 
-public class BankAccountOverdraftTest {
+@DisplayName("BankAccountOverdraft - Feature 2 : Découvert")
+class BankAccountOverdraftTest {
 
     @Test
-    @DisplayName("Devrait créer un compte avec un numéro et un solde")
+    @DisplayName("Crée un compte avec un numéro et un solde")
     void should_create_account_with_number_and_balance() {
         String number = "123456";
         double balance = 1000.0;
@@ -28,7 +28,7 @@ public class BankAccountOverdraftTest {
     }
 
     @Test
-    @DisplayName("Devrait refuser de créer un compte avec une limite de découvert négative")
+    @DisplayName("Refuse la création avec une limite de découvert négative")
     void should_reject_negative_overdraft_limit() {
         assertThrows(
             InvalidAmountException.class,
@@ -37,7 +37,7 @@ public class BankAccountOverdraftTest {
     }
 
     @Test
-    @DisplayName("Devrait déposer de l'argent sur le compte")
+    @DisplayName("Dépose de l'argent sur le compte")
     void should_deposit_money() {
         BankAccountOverdraft account = new BankAccountOverdraft("123456", 1000.0,1000);
 
@@ -47,7 +47,7 @@ public class BankAccountOverdraftTest {
     }
 
     @Test
-    @DisplayName("Devrait refuser un dépôt négatif")
+    @DisplayName("Refuse un dépôt négatif")
     void should_reject_negative_deposit() {
         BankAccountOverdraft account = new BankAccountOverdraft("123456", 1000.0, 1000.0);
 
@@ -58,8 +58,8 @@ public class BankAccountOverdraftTest {
     }
 
     @Test
-    @DisplayName("Devrait retirer de l'argent du compte")
-    void should_withdraw_money() throws InsufficientBalanceException{
+    @DisplayName("Retire de l'argent du compte")
+    void should_withdraw_money() {
         
         BankAccountOverdraft account = new BankAccountOverdraft("123456", 1000.0,1000);
 
@@ -69,8 +69,8 @@ public class BankAccountOverdraftTest {
     }
 
     @Test
-    @DisplayName("Devrait autoriser un retrait si solde suffisant")
-    void should_accept_withdrawal_with_overdraft() throws InsufficientBalanceException{
+    @DisplayName("Autorise un retrait dans la limite du découvert")
+    void should_accept_withdrawal_with_overdraft() {
         
         BankAccountOverdraft account = new BankAccountOverdraft("123456", 500.0,1000);
 
@@ -79,7 +79,7 @@ public class BankAccountOverdraftTest {
     }
 
     @Test
-    @DisplayName("Devrait refuser un retrait négatif")
+    @DisplayName("Refuse un retrait négatif")
     void should_reject_negative_withdrawal() {
         BankAccountOverdraft account = new BankAccountOverdraft("123456", 500.0, 1000.0);
 
@@ -90,7 +90,7 @@ public class BankAccountOverdraftTest {
     }
 
     @Test
-    @DisplayName("Devrait refuser un retrait si solde insuffisant")
+    @DisplayName("Refuse un retrait au-delà de la limite de découvert")
     void should_reject_withdrawal_if_insufficient_balance() {
         
         BankAccountOverdraft account = new BankAccountOverdraft("123456", 500.0,1000);
@@ -98,12 +98,12 @@ public class BankAccountOverdraftTest {
         assertThrows(
             OverdraftLimitExceededException.class,
             () -> account.withdraw(1600.0),
-            "Un retrait supérieur au solde devrait lever une exception"
+            "Un retrait dépassant la limite de découvert devrait lever une exception"
         );
     }
 
     @Test
-    @DisplayName("Devrait émettre un relevé de compte découvert avec type, solde et opérations")
+    @DisplayName("Émet un relevé avec type de compte, solde et opérations")
     void should_emit_overdraft_statement_with_account_type_balance_and_operations() {
         BankAccountOverdraft account = new BankAccountOverdraft("123456", 1000.0, 1000.0);
         account.deposit(200.0);
@@ -117,7 +117,7 @@ public class BankAccountOverdraftTest {
     }
 
     @Test
-    @DisplayName("Devrait trier les opérations du relevé découvert en ordre antéchronologique")
+    @DisplayName("Trie les opérations du relevé en ordre antéchronologique")
     void should_sort_overdraft_statement_operations_by_descending_date() throws InterruptedException {
         BankAccountOverdraft account = new BankAccountOverdraft("123456", 1000.0, 1000.0);
         Thread.sleep(5);

@@ -2,6 +2,7 @@ package fr.albin.bank_account.domain.model;
 
 import java.time.LocalDateTime;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -14,10 +15,11 @@ import fr.albin.bank_account.domain.exception.InsufficientBalanceException;
 import fr.albin.bank_account.domain.model.enums.TypeAccount;
 import fr.albin.bank_account.domain.model.enums.TypeOperation;
 
-public class SavingsAccountTest {
+@DisplayName("SavingsAccount - Feature 3 : Livret")
+class SavingsAccountTest {
 
     @Test
-    @DisplayName("Devrait créer un compte avec un numéro et un solde avec ")
+    @DisplayName("Crée un livret avec numéro, solde et plafond")
     void should_create_savings_account_with_number_and_balance() {
         String number = "123456";
         double balance = 1000.0;
@@ -26,11 +28,11 @@ public class SavingsAccountTest {
 
         assertEquals(number, account.getAccountNumber());
         assertEquals(balance, account.getBalance());
-        assertEquals(plafond, account.getdepositCap());
+        assertEquals(plafond, account.getDepositCap());
     }
 
     @Test
-    @DisplayName("Devrait refuser de créer un livret avec un plafond négatif")
+    @DisplayName("Refuse la création d'un livret avec plafond négatif")
     void should_reject_negative_deposit_cap() {
         assertThrows(
             InvalidAmountException.class,
@@ -39,21 +41,21 @@ public class SavingsAccountTest {
     }
 
     @Test
-    @DisplayName(" réfuser de créer un compte avec un solde < 0")
-    void should_not_create_account_with_negative_balance() {
+    @DisplayName("Refuse la création d'un livret si le solde dépasse le plafond")
+    void should_not_create_account_with_balance_above_cap() {
         String number = "123456";
         double balance = 2500.0;
         double depositCap = 1600;
         assertThrows(
             DepositCapExceededException.class,
             () -> new SavingsAccount(number, balance,depositCap),
-            "La création d'un compte avec un solde négatif devrait lever une exception"
+            "La création d'un livret avec un solde supérieur au plafond devrait lever une exception"
         ); 
     }
 
     @Test
-    @DisplayName(" réfuser de créer un compte avec un solde < 0")
-    void should_not_create_account_with_balance_() {
+    @DisplayName("Refuse la création d'un livret avec solde négatif")
+    void should_not_create_account_with_negative_balance() {
         String number = "123456";
         double balance = -500.0;
         assertThrows(
@@ -64,7 +66,30 @@ public class SavingsAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait déposer de l'argent sur le compte")
+    @DisplayName("Devrait réfuser de créer un compte avec un solde < depositCap")
+    void should_not_create_account_with_balance_sup_depositCap() {
+        String number = "123456";
+        double balance = 2500.0;
+        assertThrows(
+            DepositCapExceededException.class,
+            () -> new SavingsAccount(number, balance,1600),
+            "La création d'un compte avec un solde négatif devrait lever une exception"
+        ); 
+    }
+
+    @Test
+    @DisplayName("Devrait réfuser de créer un compte avec un solde = depositCap")
+    void should_not_create_account_with_balance_eq_depositCap() {
+        String number = "123456";
+        double balance = 2500.0;
+        assertDoesNotThrow(
+            () -> new SavingsAccount(number, balance,balance),
+            "La création d'un compte avec un solde négatif devrait lever une exception"
+        ); 
+    }
+
+    @Test
+    @DisplayName("Dépose de l'argent sur le livret")
     void should_deposit_money(){
         SavingsAccount account = new SavingsAccount("123456", 1000.0,1600);
 
@@ -74,7 +99,17 @@ public class SavingsAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait refuser un dépôt négatif")
+    @DisplayName("Devrait déposer de l'argent sur le compte")
+    void should_deposit_money_eq_desiteCape(){
+        SavingsAccount account = new SavingsAccount("123456", 1000.0,1600);
+
+        account.deposit(600.0);
+
+        assertEquals(1600.0, account.getBalance());
+    }
+
+    @Test
+    @DisplayName("Refuse un dépôt négatif")
     void should_reject_negative_deposit(){
         SavingsAccount account = new SavingsAccount("123456", 1000.0,1600);
 
@@ -85,7 +120,7 @@ public class SavingsAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait refuser un dépôt à zéro")
+    @DisplayName("Refuse un dépôt à zéro")
     void should_reject_zero_deposit(){
         SavingsAccount account = new SavingsAccount("123456", 1000.0,1600);
 
@@ -96,8 +131,8 @@ public class SavingsAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait refuser le dépot si plafond atteind")
-    void should_reject_deposit_money(){
+    @DisplayName("Refuse un dépôt qui dépasse le plafond")
+    void should_reject_deposit_above_cap(){
         SavingsAccount account = new SavingsAccount("123456", 1000.0,1600);
 
         account.deposit(500.0);
@@ -110,7 +145,7 @@ public class SavingsAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait retirer de l'argent du compte")
+    @DisplayName("Retire de l'argent du livret")
     void should_withdraw_money(){
         
         SavingsAccount account = new SavingsAccount("123456", 1000.0,1600);
@@ -121,7 +156,7 @@ public class SavingsAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait refuser un retrait négatif")
+    @DisplayName("Refuse un retrait négatif")
     void should_reject_negative_withdrawal(){
         SavingsAccount account = new SavingsAccount("123456", 1000.0,1600);
 
@@ -132,7 +167,7 @@ public class SavingsAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait refuser un retrait à zéro")
+    @DisplayName("Refuse un retrait à zéro")
     void should_reject_zero_withdrawal(){
         SavingsAccount account = new SavingsAccount("123456", 1000.0,1600);
 
@@ -143,7 +178,7 @@ public class SavingsAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait refuser un retrait si solde insuffisant")
+    @DisplayName("Refuse un retrait si le solde est insuffisant")
     void should_reject_withdrawal_if_insufficient_balance() {
         
         SavingsAccount account = new SavingsAccount("123456", 500.0,1600);
@@ -156,7 +191,7 @@ public class SavingsAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait accepter un retrait égal au solde exact")
+    @DisplayName("Accepte un retrait égal au solde exact")
     void should_allow_withdrawal_equal_to_balance(){
         
         SavingsAccount account = new SavingsAccount("123456", 500.0,1600);
@@ -167,7 +202,7 @@ public class SavingsAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait émettre un relevé de livret avec type de compte, solde et opérations")
+    @DisplayName("Émet un relevé de livret avec type de compte, solde et opérations")
     void should_emit_savings_statement_with_account_type_balance_and_operations() {
         SavingsAccount account = new SavingsAccount("123456", 1000.0, 3000.0);
         account.deposit(200.0);
@@ -181,7 +216,7 @@ public class SavingsAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait trier les opérations du relevé livret en ordre antéchronologique")
+    @DisplayName("Trie les opérations du relevé en ordre antéchronologique")
     void should_sort_savings_statement_operations_by_descending_date() throws InterruptedException {
         SavingsAccount account = new SavingsAccount("123456", 1000.0, 3000.0);
         Thread.sleep(5);

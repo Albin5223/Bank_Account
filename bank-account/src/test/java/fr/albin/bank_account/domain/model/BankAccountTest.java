@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class BankAccountTest {
 
     @Test
-    @DisplayName("Devrait créer un compte avec un numéro et un solde")
+    @DisplayName("Crée un compte avec un numéro et un solde")
     void should_create_account_with_number_and_balance() {
         String number = "123456";
         double balance = 1000.0;
@@ -26,7 +26,7 @@ class BankAccountTest {
     }
 
     @Test
-    @DisplayName(" réfuser de créer un compte avec un solde < 0")
+    @DisplayName("Refuse la création d'un compte avec un solde négatif")
     void should_not_create_account_with_negative_balance() {
         String number = "123456";
         double balance = -500.0;
@@ -38,7 +38,7 @@ class BankAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait déposer de l'argent sur le compte")
+    @DisplayName("Dépose de l'argent sur le compte")
     void should_deposit_money() {
         BankAccount account = new BankAccount("123456", 1000.0);
 
@@ -48,7 +48,7 @@ class BankAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait refuser un dépôt négatif")
+    @DisplayName("Refuse un dépôt négatif")
     void should_reject_negative_deposit() {
         BankAccount account = new BankAccount("123456", 1000.0);
 
@@ -60,7 +60,7 @@ class BankAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait refuser un dépôt à zéro")
+    @DisplayName("Refuse un dépôt à zéro")
     void should_reject_zero_deposit() {
         BankAccount account = new BankAccount("123456", 1000.0);
 
@@ -72,8 +72,8 @@ class BankAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait retirer de l'argent du compte")
-    void should_withdraw_money() throws InsufficientBalanceException{
+    @DisplayName("Retire de l'argent du compte")
+    void should_withdraw_money() {
 
         BankAccount account = new BankAccount("123456", 1000.0);
 
@@ -83,7 +83,7 @@ class BankAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait refuser un retrait négatif")
+    @DisplayName("Refuse un retrait négatif")
     void should_reject_negative_withdrawal() {
         BankAccount account = new BankAccount("123456", 1000.0);
 
@@ -95,7 +95,7 @@ class BankAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait refuser un retrait à zéro")
+    @DisplayName("Refuse un retrait à zéro")
     void should_reject_zero_withdrawal() {
         BankAccount account = new BankAccount("123456", 1000.0);
 
@@ -107,7 +107,7 @@ class BankAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait refuser un retrait si solde insuffisant")
+    @DisplayName("Refuse un retrait si le solde est insuffisant")
     void should_reject_withdrawal_if_insufficient_balance() {
         BankAccount account = new BankAccount("123456", 500.0);
 
@@ -119,8 +119,8 @@ class BankAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait accepter un retrait égal au solde exact")
-    void should_allow_withdrawal_equal_to_balance() throws InsufficientBalanceException{
+    @DisplayName("Accepte un retrait égal au solde exact")
+    void should_allow_withdrawal_equal_to_balance() {
 
         BankAccount account = new BankAccount("123456", 500.0);
 
@@ -130,7 +130,7 @@ class BankAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait émettre un relevé avec type de compte, solde et opérations")
+    @DisplayName("Émet un relevé avec type de compte, solde et opérations")
     void should_emit_statement_with_account_type_balance_and_operations() {
         BankAccount account = new BankAccount("123456", 1000.0);
         account.deposit(200.0);
@@ -144,7 +144,7 @@ class BankAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait trier les opérations du relevé en ordre antéchronologique")
+    @DisplayName("Trie les opérations du relevé en ordre antéchronologique")
     void should_sort_statement_operations_by_descending_date() throws InterruptedException {
         BankAccount account = new BankAccount("123456", 1000.0);
         Thread.sleep(5);
@@ -160,7 +160,7 @@ class BankAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait exclure les opérations hors du mois glissant")
+    @DisplayName("Exclut les opérations hors du mois glissant")
     void should_exclude_operations_outside_sliding_month() {
         BankAccount account = new BankAccount("123456", 1000.0);
         account.deposit(200.0);

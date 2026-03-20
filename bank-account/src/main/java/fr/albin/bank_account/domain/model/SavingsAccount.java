@@ -27,7 +27,7 @@ public class SavingsAccount extends BankAccount{
         this.depositCap = depositCap;
     }
 
-    public double getdepositCap(){
+    public double getDepositCap(){
         return depositCap;
     }
 
@@ -37,14 +37,13 @@ public class SavingsAccount extends BankAccount{
     }
 
     @Override
-    public void deposit(double depot){
+    public void checkDepositValid(double depot){
         if (depot <= 0) {
             throw new InvalidAmountException("Le montant du dépôt doit être strictement positif");
         }
         if(super.balance + depot > depositCap){
             throw new DepositCapExceededException("Plafond dépassé");
         }
-        super.deposit(depot); 
     }
 
 

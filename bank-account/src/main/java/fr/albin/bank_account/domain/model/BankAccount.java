@@ -46,21 +46,30 @@ public class BankAccount {
         return List.copyOf(operations);
     }
 
-    public void deposit(double depot){
+    public void checkDepositValid(double depot){
         if (depot <= 0) {
             throw new InvalidAmountException("Le montant du dépôt doit être strictement positif");
         }
+    }
+
+    public final void deposit(double depot){
+        checkDepositValid(depot);
         balance += depot;
         operations.add(new Operation(LocalDateTime.now(), TypeOperation.DEPOSIT, depot));
     }
 
-    public void withdraw(double retrait){
+    public void checkWithdrawValid(double retrait){
         if (retrait <= 0) {
             throw new InvalidAmountException("Le montant du retrait doit être strictement positif");
         }
         if (balance-retrait<0){
             throw new InsufficientBalanceException("Solde insuffisant");
         }
+    }
+
+
+    public final void withdraw(double retrait){
+        checkWithdrawValid(retrait);
         balance -= retrait;
         operations.add(new Operation(LocalDateTime.now(), TypeOperation.WITHDRAWAL, retrait));
     }

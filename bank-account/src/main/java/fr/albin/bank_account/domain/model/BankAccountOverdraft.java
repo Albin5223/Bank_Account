@@ -1,10 +1,7 @@
 package fr.albin.bank_account.domain.model;
 
-import java.time.LocalDateTime;
-
 import fr.albin.bank_account.domain.exception.InvalidAmountException;
 import fr.albin.bank_account.domain.exception.OverdraftLimitExceededException;
-import fr.albin.bank_account.domain.model.enums.TypeOperation;
 
 public class BankAccountOverdraft extends BankAccount {
 
@@ -27,15 +24,13 @@ public class BankAccountOverdraft extends BankAccount {
     }
 
     @Override
-    public void withdraw(double retrait){
+    public void checkWithdrawValid(double retrait){
         if (retrait <= 0) {
             throw new InvalidAmountException("Le montant du retrait doit être strictement positif");
         }
-        if (balance - retrait < -limit){
+        if (balance - retrait + limit < 0){
             throw new OverdraftLimitExceededException("Limite de découvert dépassée");
         }
-        balance -= retrait;
-        operations.add(new Operation(LocalDateTime.now(), TypeOperation.WITHDRAWAL, retrait));
     }
     
 }
