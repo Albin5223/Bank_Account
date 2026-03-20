@@ -8,7 +8,7 @@ package fr.albin.bank_account.domain.exception;
  * selon les règles du domaine.
  * </p>
  */
-public class InvalidAmountException extends RuntimeException {
+public class InvalidAmountException extends IllegalArgumentException {
 
     public InvalidAmountException(String message) {
         super(message);

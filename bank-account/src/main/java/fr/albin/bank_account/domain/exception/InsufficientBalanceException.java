@@ -7,7 +7,7 @@ package fr.albin.bank_account.domain.exception;
  * opération ne respecte pas la contrainte de solde minimal autorisé.
  * </p>
  */
-public class InsufficientBalanceException extends RuntimeException{
+public class InsufficientBalanceException extends IllegalArgumentException{
 
     public InsufficientBalanceException(String message) {
         super(message);
