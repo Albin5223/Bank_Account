@@ -46,6 +46,11 @@ public class BankAccount {
         return List.copyOf(operations);
     }
 
+    public void loadOperations(List<Operation> persistedOperations) {
+        this.operations.clear();
+        this.operations.addAll(persistedOperations);
+    }
+
     public void checkDepositValid(double depot){
         if (depot <= 0) {
             throw new InvalidAmountException("Le montant du dépôt doit être strictement positif");
@@ -74,8 +79,8 @@ public class BankAccount {
         operations.add(new Operation(LocalDateTime.now(), TypeOperation.WITHDRAWAL, retrait));
     }
 
-    protected TypeAccount getAccountType() {
-        return TypeAccount.BankAccount;
+    public TypeAccount getAccountType() {
+        return TypeAccount.BANK_ACCOUNT;
     }
 
     public AccountStatement emitStatement(LocalDateTime emissionDate) {

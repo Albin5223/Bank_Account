@@ -32,8 +32,8 @@ public class SavingsAccount extends BankAccount{
     }
 
     @Override
-    protected TypeAccount getAccountType() {
-        return TypeAccount.SavingsAccount;
+    public TypeAccount getAccountType() {
+        return TypeAccount.SAVINGS_ACCOUNT;
     }
 
     @Override

@@ -97,6 +97,75 @@ Ce relevé devra faire apparaître :
 ## Bonne chance !
 
 
+## Pour tester l'application 
+
+- Base URL : `http://localhost:8080`
+
+### 1 Créer un compte courant
+
+```
+curl -i -X POST http://localhost:8080/api/accounts/createBankAccount \
+	-H "Content-Type: application/json" \
+	-d '{"balance":100}'
+```
+
+
+### 2 Créer un compte avec découvert autorisé
+
+```
+curl -i -X POST http://localhost:8080/api/accounts/createBankAccountOverdraft \
+	-H "Content-Type: application/json" \
+	-d '{"balance":100,"overdraft":200}'
+```
+
+
+### 3 Créer un livret d'épargne
+
+```
+curl -i -X POST http://localhost:8080/api/accounts/createSavingsAccount \
+	-H "Content-Type: application/json" \
+	-d '{"balance":500,"depositCap":22950}'
+```
+
+### 4 Déposer de l'argent
+
+```
+curl -i -X POST http://localhost:8080/api/accounts/depositMoney \
+	-H "Content-Type: application/json" \
+	-d '{"accountNumber":"ACC-401564993617","amount":40}'
+```
+
+
+### 5 Retirer de l'argent
+
+```
+curl -i -X POST http://localhost:8080/api/accounts/withdrawMoney \
+	-H "Content-Type: application/json" \
+	-d '{"accountNumber":"ACC-00000123","amount":20}'
+```
+
+
+### 6 Obtenir le relevé de compte
+
+```
+curl -i -X GET http://localhost:8080/api/accounts/accountStatement \
+	-H "Content-Type: application/json" \
+	-d '{"accountNumber":"ACC-833155830088","date":"2026-03-29T17:00:00"}'
+```
+
+- Réponse attendue : `200 OK` avec le relevé JSON
+
+### Codes d'erreur possibles
+
+- `400 Bad Request` : payload invalide
+- `404 Not Found` : compte introuvable
+- `409 Conflict` : règle métier violée
+- `500 Internal Server Error` : erreur inattendue
+
+
+
+
+
 ![archi-hexa](./assets/hexa-schema.png)
 
 

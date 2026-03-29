@@ -22,11 +22,16 @@ import fr.albin.bank_account.domain.port.in.GetAccountStatementUseCase;
 import fr.albin.bank_account.domain.port.in.WithdrawMoneyUseCase;
 import fr.albin.bank_account.infrastructure.TDO.CreateBankAccountOverdraftRequest;
 import fr.albin.bank_account.infrastructure.TDO.CreateBankAccountRequest;
+import fr.albin.bank_account.infrastructure.TDO.CreateAccountResponse;
 import fr.albin.bank_account.infrastructure.TDO.CreateSavingsAccountRequest;
 import fr.albin.bank_account.infrastructure.TDO.DepositMoneyRequest;
 import fr.albin.bank_account.infrastructure.TDO.GetAccountStatementRequest;
 import fr.albin.bank_account.infrastructure.TDO.WithdrawMoneyRequest;
 
+/**
+ * Contrôleur REST pour la gestion des comptes bancaires. Cette classe expose des endpoints
+ * pour créer des comptes bancaires, déposer de l'argent, retirer de l'argent et obtenir le relevé de compte.
+ */
 @RestController
 @RequestMapping("/api/accounts")
 public class BankAccountController {
@@ -54,11 +59,11 @@ public class BankAccountController {
     }
 
     @PostMapping("/createBankAccount")
-    public ResponseEntity<String> createBankAccount(@Validated @RequestBody CreateBankAccountRequest request) {
+    public ResponseEntity<?> createBankAccount(@Validated @RequestBody CreateBankAccountRequest request) {
         try {
             String accountId = createBankAccountUseCase.createBankAccount(request.balance());
             URI location = URI.create("/api/accounts/" + accountId);
-            return ResponseEntity.created(location).build(); // 201
+            return ResponseEntity.created(location).body(new CreateAccountResponse(accountId)); // 201
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage()); // 400
         } catch (Exception e) {
@@ -67,11 +72,11 @@ public class BankAccountController {
     }
 
     @PostMapping("/createSavingsAccount")
-    public ResponseEntity<String> createSavingsAccount(@Validated @RequestBody CreateSavingsAccountRequest request) {
+    public ResponseEntity<?> createSavingsAccount(@Validated @RequestBody CreateSavingsAccountRequest request) {
         try {
             String accountId = createSavingsAccountUseCase.createSavingsAccount(request.balance(), request.depositCap());
             URI location = URI.create("/api/accounts/" + accountId);
-            return ResponseEntity.created(location).build(); // 201
+            return ResponseEntity.created(location).body(new CreateAccountResponse(accountId)); // 201
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage()); // 400
         } catch (IllegalStateException e) {
@@ -82,11 +87,11 @@ public class BankAccountController {
     }
 
     @PostMapping("/createBankAccountOverdraft")
-    public ResponseEntity<String> createBankAccountOverdraft(@Validated @RequestBody CreateBankAccountOverdraftRequest request) {
+    public ResponseEntity<?> createBankAccountOverdraft(@Validated @RequestBody CreateBankAccountOverdraftRequest request) {
         try {
             String accountId = createBankAccountOverdraftUseCase.createBankAccountOverdraft(request.balance(), request.overdraft());
             URI location = URI.create("/api/accounts/" + accountId);
-            return ResponseEntity.created(location).build(); // 201
+            return ResponseEntity.created(location).body(new CreateAccountResponse(accountId)); // 201
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage()); // 400
         } catch (IllegalStateException e) {

@@ -138,7 +138,7 @@ class BankAccountTest {
 
         AccountStatement statement = account.emitStatement(LocalDateTime.now());
 
-        assertEquals(TypeAccount.BankAccount, statement.getAccountType());
+        assertEquals(TypeAccount.BANK_ACCOUNT, statement.getAccountType());
         assertEquals(1150.0, statement.getBalance());
         assertEquals(3, statement.getOperations().size());
     }

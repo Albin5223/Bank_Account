@@ -1,3 +1,10 @@
 spring:
   application:
     name: bank-account
+  jpa:
+    hibernate:
+      ddl-auto: update  # ou validate en prod
+    show-sql: false
+  datasource:
+    url: jdbc:h2:file:./data/bankdb   # H2 pour les tests
+    driver-class-name: org.h2.Driver

@@ -3,14 +3,15 @@ package fr.albin.bank_account.infrastructure.adapter.in;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyString;
 
 import org.junit.jupiter.api.DisplayName;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -30,18 +31,7 @@ import fr.albin.bank_account.infrastructure.TDO.*;
 import tools.jackson.databind.ObjectMapper;
 
 
-@SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.MOCK,
-    properties = {
-        "spring.autoconfigure.exclude=" +
-            "org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration," +
-            "org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration," +
-            "org.springframework.boot.jdbc.autoconfigure.DataSourceInitializationAutoConfiguration," +
-            "org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration," +
-            "org.springframework.boot.data.jpa.autoconfigure.JpaRepositoriesAutoConfiguration",
-        "spring.sql.init.mode=never"
-    }
-)
+@WebMvcTest
 @AutoConfigureMockMvc
 @DisplayName("POST /api/accounts/create - contrat d'ouverture de compte")
 class BankAccountControllerTest {
@@ -80,7 +70,8 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/createBankAccount")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.accountNumber").value("ACC-001"));
     }
 
     @Test
@@ -118,7 +109,8 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/createSavingsAccount")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.accountNumber").value("SAV-001"));
     }
 
     @Test
@@ -156,7 +148,8 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/createBankAccountOverdraft")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.accountNumber").value("OVD-001"));
     }
 
     @Test
@@ -189,7 +182,7 @@ class BankAccountControllerTest {
     @DisplayName("Teste l'endpoint qui permet de consulter le relevé de compte - Devrait terminer en succès")
     void testGetAccountStatement_Success() throws Exception {
         GetAccountStatementRequest request = new GetAccountStatementRequest("ACC-001", LocalDateTime.now());
-        AccountStatement accountStatement = new AccountStatement(TypeAccount.BankAccount, 1000.00, LocalDateTime.now(), List.of());
+        AccountStatement accountStatement = new AccountStatement(TypeAccount.BANK_ACCOUNT, 1000.00, LocalDateTime.now(), List.of());
         
         when(getAccountStatementUseCase.getAccountStatement(anyString(), any(LocalDateTime.class)))
                 .thenReturn(accountStatement);

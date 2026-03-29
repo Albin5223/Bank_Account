@@ -170,7 +170,7 @@ class BankAccountServiceTest {
         LocalDateTime emissionDate = LocalDateTime.now();
         AccountStatement statement = service.getAccountStatement("ACC-20", emissionDate);
 
-        assertEquals(TypeAccount.BankAccount, statement.getAccountType());
+        assertEquals(TypeAccount.BANK_ACCOUNT, statement.getAccountType());
         assertEquals(120.0, statement.getBalance());
         assertEquals(emissionDate, statement.getEmissionDate());
         assertEquals(2, statement.getOperations().size());

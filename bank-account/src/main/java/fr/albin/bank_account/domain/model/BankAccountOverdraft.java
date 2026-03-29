@@ -2,6 +2,7 @@ package fr.albin.bank_account.domain.model;
 
 import fr.albin.bank_account.domain.exception.InvalidAmountException;
 import fr.albin.bank_account.domain.exception.OverdraftLimitExceededException;
+import fr.albin.bank_account.domain.model.enums.TypeAccount;
 
 public class BankAccountOverdraft extends BankAccount {
 
@@ -23,6 +24,10 @@ public class BankAccountOverdraft extends BankAccount {
         this.limit = limit;
     }
 
+    public double getLimit() {
+        return limit;
+    }
+
     @Override
     public void checkWithdrawValid(double retrait){
         if (retrait <= 0) {
@@ -31,6 +36,11 @@ public class BankAccountOverdraft extends BankAccount {
         if (balance - retrait + limit < 0){
             throw new OverdraftLimitExceededException("Limite de découvert dépassée");
         }
+    }
+
+    @Override
+    public TypeAccount getAccountType() {
+        return TypeAccount.BANK_ACCOUNT_OVERDRAFT;
     }
     
 }

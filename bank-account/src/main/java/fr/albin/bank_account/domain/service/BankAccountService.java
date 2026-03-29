@@ -2,9 +2,12 @@ package fr.albin.bank_account.domain.service;
 
 import java.time.LocalDateTime;
 
+import org.springframework.stereotype.Service;
+
 import fr.albin.bank_account.domain.model.AccountStatement;
 import fr.albin.bank_account.domain.model.BankAccount;
 import fr.albin.bank_account.domain.model.BankAccountOverdraft;
+import fr.albin.bank_account.domain.model.BankAccountFactory;
 import fr.albin.bank_account.domain.model.SavingsAccount;
 import fr.albin.bank_account.domain.port.in.CreateBankAccountOverdraftUseCase;
 import fr.albin.bank_account.domain.port.in.CreateBankAccountUseCase;
@@ -16,6 +19,12 @@ import fr.albin.bank_account.domain.port.out.GenerateAccountNumberPort;
 import fr.albin.bank_account.domain.port.out.LoadBankAccountPort;
 import fr.albin.bank_account.domain.port.out.SaveBankAccountPort;
 
+/**
+ * Service de domaine pour la gestion des comptes bancaires. Cette classe implémente les cas d'utilisation
+ * de création de comptes bancaires, de dépôt d'argent, de retrait d'argent et d'obtention du relevé de compte.
+ * Elle utilise les ports de sortie pour générer des numéros de compte, charger des comptes existants et sauvegarder les comptes modifiés. 
+ */
+@Service
 public class BankAccountService implements
     CreateBankAccountUseCase,
     CreateSavingsAccountUseCase,
@@ -41,7 +50,7 @@ public class BankAccountService implements
     @Override
     public String createBankAccount(double balance) {
         String accountNumber = generateAccountNumberPort.generateAccountNumber();
-        BankAccount account = new BankAccount(accountNumber, balance);
+        BankAccount account = BankAccountFactory.createStandard(accountNumber, balance);
         saveBankAccountPort.save(account);
         return accountNumber;
     }
@@ -49,7 +58,7 @@ public class BankAccountService implements
     @Override
     public String createSavingsAccount(double balance, double depositCap) {
         String accountNumber = generateAccountNumberPort.generateAccountNumber();
-        SavingsAccount account = new SavingsAccount(accountNumber, balance, depositCap);
+        SavingsAccount account = BankAccountFactory.createSavings(accountNumber, balance, depositCap);
         saveBankAccountPort.save(account);
         return accountNumber;
     }
@@ -57,7 +66,7 @@ public class BankAccountService implements
     @Override
     public String createBankAccountOverdraft(double balance, double overdraft) {
         String accountNumber = generateAccountNumberPort.generateAccountNumber();
-        BankAccountOverdraft account = new BankAccountOverdraft(accountNumber, balance, overdraft);
+        BankAccountOverdraft account = BankAccountFactory.createOverdraft(accountNumber, balance, overdraft);
         saveBankAccountPort.save(account);
         return accountNumber;
     }
