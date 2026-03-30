@@ -2,7 +2,7 @@ package fr.albin.bank_account.infrastructure.adapter.out.persistence.adapter;
 
 import java.util.Optional;
 
-import fr.albin.bank_account.domain.model.BankAccount;
+import fr.albin.bank_account.domain.model.interfaces.BankAccountImpl;
 import fr.albin.bank_account.domain.port.out.LoadBankAccountPort;
 import fr.albin.bank_account.infrastructure.adapter.out.persistence.entity.BankAccountEntity;
 import fr.albin.bank_account.infrastructure.adapter.out.persistence.repository.BankAccountRepository;
@@ -25,7 +25,7 @@ public class LoadBankAccountAdapter implements LoadBankAccountPort {
     }
 
     @Override
-    public Optional<BankAccount> loadByAccountNumber(String accountNumber) {
+    public Optional<BankAccountImpl> loadByAccountNumber(String accountNumber) {
         return Optional.ofNullable(bankAccountRepository.findByAccountNumber(accountNumber))
                 .map(BankAccountEntity::toBankAccount);
     }

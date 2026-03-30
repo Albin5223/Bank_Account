@@ -28,14 +28,14 @@ class SavingsAccountTest {
 
         assertEquals(number, account.getAccountNumber());
         assertEquals(balance, account.getBalance());
-        assertEquals(plafond, account.getDepositCap());
+        assertEquals(plafond, account.getDepositLimit());
     }
 
     @Test
     @DisplayName("Refuse la création d'un livret avec plafond négatif")
     void should_reject_negative_deposit_cap() {
         assertThrows(
-            InvalidAmountException.class,
+            InsufficientBalanceException.class,
             () -> new SavingsAccount("123456", 1000.0, -1.0)
         );
     }

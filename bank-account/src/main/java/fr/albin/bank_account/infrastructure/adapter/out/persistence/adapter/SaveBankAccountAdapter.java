@@ -1,6 +1,6 @@
 package fr.albin.bank_account.infrastructure.adapter.out.persistence.adapter;
 
-import fr.albin.bank_account.domain.model.BankAccount;
+import fr.albin.bank_account.domain.model.interfaces.BankAccountImpl;
 import fr.albin.bank_account.domain.port.out.SaveBankAccountPort;
 import fr.albin.bank_account.infrastructure.adapter.out.persistence.entity.BankAccountEntity;
 import fr.albin.bank_account.infrastructure.adapter.out.persistence.repository.BankAccountRepository;
@@ -24,7 +24,7 @@ public class SaveBankAccountAdapter implements SaveBankAccountPort {
     }
 
     @Override
-    public void save(BankAccount bankAccount) {
+    public void save(BankAccountImpl bankAccount) {
         BankAccountEntity bankAccountEntity = new BankAccountEntity(bankAccount);
         bankAccountRepository.save(bankAccountEntity);
     }

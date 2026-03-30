@@ -2,8 +2,8 @@ package fr.albin.bank_account.domain.model;
 
 import java.util.List;
 
-import fr.albin.bank_account.domain.exception.OverdraftLimitExceededException;
 import fr.albin.bank_account.domain.model.enums.TypeAccount;
+import fr.albin.bank_account.domain.model.interfaces.BankAccountImpl;
 
 /**
  * Factory pour créer et recharger les comptes bancaires.
@@ -25,7 +25,7 @@ public final class BankAccountFactory {
         return new BankAccountOverdraft(accountNumber, balance, overdraftLimit);
     }
 
-    public static BankAccount rehydrate(
+    public static BankAccountImpl rehydrate(
             String accountNumber,
             double balance,
             double overdraftLimit,
@@ -33,37 +33,24 @@ public final class BankAccountFactory {
             TypeAccount accountType,
             List<Operation> operations) {
 
-        BankAccount account;
-
-        if (TypeAccount.SAVINGS_ACCOUNT.equals(accountType)) {
-            account = new SavingsAccount(accountNumber, balance, depositLimit);
-            applyOperations(account, operations);
-            return account;
+        BankAccountImpl account;
+        
+        switch (accountType) {
+            case SAVINGS_ACCOUNT:
+                account = new SavingsAccount(accountNumber, balance, depositLimit);
+                break;
+            case BANK_ACCOUNT_OVERDRAFT:
+                account = new BankAccountOverdraft(accountNumber, 0, overdraftLimit);
+                ((BankAccountOverdraft) account).balance = balance; // Met à jour le solde après la création du compte
+                break;
+            default:
+                account = new BankAccount(accountNumber, balance);
         }
-
-        if (TypeAccount.BANK_ACCOUNT_OVERDRAFT.equals(accountType)) {
-            account = rehydrateOverdraft(accountNumber, balance, overdraftLimit);
-            applyOperations(account, operations);
-            return account;
-        }
-
-        account = new BankAccount(accountNumber, balance);
         applyOperations(account, operations);
         return account;
     }
 
-    private static BankAccountOverdraft rehydrateOverdraft(String accountNumber, double balance, double overdraftLimit) {
-        if (balance < -overdraftLimit) {
-            throw new OverdraftLimitExceededException("Limite de découvert dépassée lors du chargement du compte");
-        }
-
-        double initialBalance = Math.max(balance, 0);
-        BankAccountOverdraft account = new BankAccountOverdraft(accountNumber, initialBalance, overdraftLimit);
-        account.balance = balance;
-        return account;
-    }
-
-    private static void applyOperations(BankAccount account, List<Operation> operations) {
+    private static void applyOperations(BankAccountImpl account, List<Operation> operations) {
         if (operations != null && !operations.isEmpty()) {
             account.loadOperations(operations);
         }

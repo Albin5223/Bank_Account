@@ -4,12 +4,10 @@ package fr.albin.bank_account.infrastructure.adapter.out.persistence.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.albin.bank_account.domain.model.BankAccount;
 import fr.albin.bank_account.domain.model.BankAccountFactory;
-import fr.albin.bank_account.domain.model.BankAccountOverdraft;
 import fr.albin.bank_account.domain.model.Operation;
-import fr.albin.bank_account.domain.model.SavingsAccount;
 import fr.albin.bank_account.domain.model.enums.TypeAccount;
+import fr.albin.bank_account.domain.model.interfaces.BankAccountImpl;
 import jakarta.persistence.Column;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -57,28 +55,15 @@ public class BankAccountEntity {
         this.accountType = accountType;
     }
 
-    public BankAccountEntity(BankAccount bankAccount){
+    public BankAccountEntity(BankAccountImpl bankAccount){
         this.accountNumber = bankAccount.getAccountNumber();
         this.balance = bankAccount.getBalance();
+
         setOperations(bankAccount.getOperations());
 
-        if (bankAccount instanceof SavingsAccount savingsAccount) {
-            this.depositLimit = savingsAccount.getDepositCap();
-            this.overdraftLimit = 0;
-            this.accountType = TypeAccount.SAVINGS_ACCOUNT;
-            return;
-        }
-
-        if (bankAccount instanceof BankAccountOverdraft bankAccountOverdraft) {
-            this.overdraftLimit = bankAccountOverdraft.getLimit();
-            this.depositLimit = 0;
-            this.accountType = TypeAccount.BANK_ACCOUNT_OVERDRAFT;
-            return;
-        }
-
-        this.overdraftLimit = 0;
-        this.depositLimit = 0;
-        this.accountType = TypeAccount.BANK_ACCOUNT;
+        this.depositLimit = bankAccount.getDepositLimit();
+        this.overdraftLimit = bankAccount.getOverdraftLimit();
+        this.accountType = bankAccount.getAccountType();
     }
 
     public String getAccountNumber() {
@@ -98,7 +83,7 @@ public class BankAccountEntity {
     }
 
 
-    public BankAccount toBankAccount() {
+    public BankAccountImpl toBankAccount() {
         return BankAccountFactory.rehydrate(
                 accountNumber,
                 balance,

@@ -1,14 +1,14 @@
 package fr.albin.bank_account.domain.service;
 
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 
 import fr.albin.bank_account.domain.model.AccountStatement;
-import fr.albin.bank_account.domain.model.BankAccount;
 import fr.albin.bank_account.domain.model.BankAccountOverdraft;
 import fr.albin.bank_account.domain.model.BankAccountFactory;
-import fr.albin.bank_account.domain.model.SavingsAccount;
+import fr.albin.bank_account.domain.model.interfaces.BankAccountImpl;
 import fr.albin.bank_account.domain.port.in.CreateBankAccountOverdraftUseCase;
 import fr.albin.bank_account.domain.port.in.CreateBankAccountUseCase;
 import fr.albin.bank_account.domain.port.in.CreateSavingsAccountUseCase;
@@ -50,7 +50,7 @@ public class BankAccountService implements
     @Override
     public String createBankAccount(double balance) {
         String accountNumber = generateAccountNumberPort.generateAccountNumber();
-        BankAccount account = BankAccountFactory.createStandard(accountNumber, balance);
+        BankAccountImpl account = BankAccountFactory.createStandard(accountNumber, balance);
         saveBankAccountPort.save(account);
         return accountNumber;
     }
@@ -58,7 +58,7 @@ public class BankAccountService implements
     @Override
     public String createSavingsAccount(double balance, double depositCap) {
         String accountNumber = generateAccountNumberPort.generateAccountNumber();
-        SavingsAccount account = BankAccountFactory.createSavings(accountNumber, balance, depositCap);
+        BankAccountImpl account = BankAccountFactory.createSavings(accountNumber, balance, depositCap);
         saveBankAccountPort.save(account);
         return accountNumber;
     }
@@ -73,7 +73,7 @@ public class BankAccountService implements
 
     @Override
     public boolean depositMoney(String accountNumber, double money) {
-        BankAccount account = loadAccountOrThrow(accountNumber);
+        BankAccountImpl account = loadAccountOrThrow(accountNumber);
         account.deposit(money);
         saveBankAccountPort.save(account);
         return true;
@@ -81,7 +81,7 @@ public class BankAccountService implements
 
     @Override
     public boolean withdrawMoney(String accountNumber, double money) {
-        BankAccount account = loadAccountOrThrow(accountNumber);
+        BankAccountImpl account = loadAccountOrThrow(accountNumber);
         account.withdraw(money);
         saveBankAccountPort.save(account);
         return true;
@@ -89,13 +89,13 @@ public class BankAccountService implements
 
     @Override
     public AccountStatement getAccountStatement(String accountNumber, LocalDateTime emissionDate) {
-        BankAccount account = loadAccountOrThrow(accountNumber);
+        BankAccountImpl account = loadAccountOrThrow(accountNumber);
         return account.emitStatement(emissionDate);
     }
 
-    private BankAccount loadAccountOrThrow(String accountNumber) {
+    private BankAccountImpl loadAccountOrThrow(String accountNumber) {
         return loadBankAccountPort
             .loadByAccountNumber(accountNumber)
-            .orElseThrow(() -> new IllegalArgumentException("Compte introuvable : " + accountNumber));
+            .orElseThrow(() -> new NoSuchElementException("Compte introuvable : " + accountNumber));
     }
 }

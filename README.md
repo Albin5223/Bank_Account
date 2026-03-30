@@ -153,19 +153,6 @@ curl -i -X GET http://localhost:8080/api/accounts/accountStatement \
 	-d '{"accountNumber":"ACC-833155830088","date":"2026-03-29T17:00:00"}'
 ```
 
-- Réponse attendue : `200 OK` avec le relevé JSON
-
-### Codes d'erreur possibles
-
-- `400 Bad Request` : payload invalide
-- `404 Not Found` : compte introuvable
-- `409 Conflict` : règle métier violée
-- `500 Internal Server Error` : erreur inattendue
-
-
-
-
-
 ![archi-hexa](./assets/hexa-schema.png)
 
 

@@ -1,46 +1,98 @@
 package fr.albin.bank_account.domain.model;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import fr.albin.bank_account.domain.exception.InvalidAmountException;
-import fr.albin.bank_account.domain.exception.OverdraftLimitExceededException;
 import fr.albin.bank_account.domain.model.enums.TypeAccount;
+import fr.albin.bank_account.domain.model.enums.TypeOperation;
+import fr.albin.bank_account.domain.model.interfaces.BankAccountImpl;
 
-public class BankAccountOverdraft extends BankAccount {
+/**
+ * Représente un compte bancaire avec une autorisation de découvert.
+ * <p>
+ * Un compte bancaire avec autorisation de découvert permet de faire des dépôts et des retraits
+ * tant que le solde du compte ne devient pas inférieur à la limite de découvert autoriséee.
+ * </p>
+ */
+public class BankAccountOverdraft implements BankAccountImpl {
 
-    protected double limit;
+    protected double overdraftLimit;
+    protected String accountNumber;
+    protected double balance;
+    protected final List<Operation> operations = new java.util.ArrayList<>();
+    
 
-    /**
-    * Cette classe représent un compte bancaire qui possède une autorisation de découvert avec une limit
-    * <p>
-    * @param number est le numéro du compte
-    * @param balance est le solde de départ du compte
-    * @param limit est la limit de découvert > 0
-    * </p>
-    */
-    public BankAccountOverdraft(String number, double balance, double limit) {
-        super(number, balance);
-        if (limit < 0) {
+    public BankAccountOverdraft(String number, double balance, double overdraftLimit) {
+        if (balance < -overdraftLimit) {
+            throw new InvalidAmountException("Le solde initial ne peut pas être inférieur à la limite de découvert");
+        }
+        if (overdraftLimit < 0) {
             throw new InvalidAmountException("La limite de découvert ne peut pas être négative");
         }
-        this.limit = limit;
+        this.overdraftLimit = overdraftLimit;
+        this.accountNumber = number;
+        this.balance = balance;
+        this.operations.add(new Operation(LocalDateTime.now(), TypeOperation.CREATE, balance));
     }
 
-    public double getLimit() {
-        return limit;
-    }
 
     @Override
-    public void checkWithdrawValid(double retrait){
-        if (retrait <= 0) {
-            throw new InvalidAmountException("Le montant du retrait doit être strictement positif");
-        }
-        if (balance - retrait + limit < 0){
-            throw new OverdraftLimitExceededException("Limite de découvert dépassée");
-        }
+    public String getAccountNumber() {
+        return accountNumber;
     }
+
+
+    @Override
+    public double getDepositLimit() {
+        return Double.MAX_VALUE;
+    }
+
+
+    @Override
+    public double getBalance() {
+        return balance;
+    }
+
 
     @Override
     public TypeAccount getAccountType() {
         return TypeAccount.BANK_ACCOUNT_OVERDRAFT;
     }
-    
+
+
+    @Override
+    public double getOverdraftLimit() {
+        return overdraftLimit;
+    }
+
+
+    @Override
+    public List<Operation> getOperations() {
+        return new ArrayList<>(operations);
+    }
+
+
+    @Override
+    public void addOperation(Operation operation) {
+        this.operations.add(operation);
+    }
+
+
+    @Override
+    public void performDeposit(double amount) {
+        this.balance += amount;
+    }
+
+
+    @Override
+    public void performWithdraw(double amount) {
+        this.balance -= amount;
+    }
+
+    @Override
+    public void clearOperations() {
+        this.operations.clear();
+    }
 }

@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import fr.albin.bank_account.domain.exception.InsufficientBalanceException;
 import fr.albin.bank_account.domain.exception.InvalidAmountException;
-import fr.albin.bank_account.domain.exception.OverdraftLimitExceededException;
 import fr.albin.bank_account.domain.model.enums.TypeAccount;
 import fr.albin.bank_account.domain.model.enums.TypeOperation;
 
@@ -96,7 +96,7 @@ class BankAccountOverdraftTest {
         BankAccountOverdraft account = new BankAccountOverdraft("123456", 500.0,1000);
 
         assertThrows(
-            OverdraftLimitExceededException.class,
+            InsufficientBalanceException.class,
             () -> account.withdraw(1600.0),
             "Un retrait dépassant la limite de découvert devrait lever une exception"
         );

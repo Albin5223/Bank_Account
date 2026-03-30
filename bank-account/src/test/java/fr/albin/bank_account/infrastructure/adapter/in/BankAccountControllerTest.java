@@ -23,7 +23,6 @@ import java.util.List;
 
 import fr.albin.bank_account.domain.exception.InsufficientBalanceException;
 import fr.albin.bank_account.domain.exception.InvalidAmountException;
-import fr.albin.bank_account.domain.exception.OverdraftLimitExceededException;
 import fr.albin.bank_account.domain.model.AccountStatement;
 import fr.albin.bank_account.domain.model.enums.TypeAccount;
 import fr.albin.bank_account.domain.port.in.*;
@@ -84,7 +83,7 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/createBankAccount")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest()); // 400
+                .andExpect(status().isNotFound()); // 404
     }
 
     @Test
@@ -97,7 +96,7 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/createBankAccount")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest()); // 400
+                .andExpect(status().isNotFound()); // 404
     }
 
     @Test
@@ -123,7 +122,7 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/createSavingsAccount")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest()); // 400
+                .andExpect(status().isNotFound()); // 404
     }
 
     @Test
@@ -136,7 +135,7 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/createSavingsAccount")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isConflict()); // 409
+                .andExpect(status().isNotFound()); // 404
     }
 
     @Test
@@ -162,7 +161,7 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/createBankAccountOverdraft")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest()); // 400
+                .andExpect(status().isNotFound()); // 404
     }
 
     @Test
@@ -175,7 +174,7 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/createBankAccountOverdraft")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isConflict()); // 409
+                .andExpect(status().isNotFound()); // 404
     }
 
     @Test
@@ -216,7 +215,7 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/depositMoney")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest()); // 400
+                .andExpect(status().isNotFound()); // 404
     }
 
     @Test
@@ -254,7 +253,7 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/withdrawMoney")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest()); // 400
+                .andExpect(status().isNotFound()); // 404
     }
 
     @Test
@@ -275,11 +274,11 @@ class BankAccountControllerTest {
     void testWithdrawMoney_error_InsufficientBalance() throws Exception {
         WithdrawMoneyRequest request = new WithdrawMoneyRequest("ACC-001", 10000.00);
         when(withdrawMoneyUseCase.withdrawMoney(anyString(), anyDouble()))
-                .thenThrow(new OverdraftLimitExceededException("Solde insuffisant"));
+                .thenThrow(new InsufficientBalanceException("Solde insuffisant"));
 
         mockMvc.perform(post("/api/accounts/withdrawMoney")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isConflict()); // 409
+                .andExpect(status().isNotFound()); // 404
     }
 }

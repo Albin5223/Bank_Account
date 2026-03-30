@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.albin.bank_account.domain.model.BankAccount;
 import fr.albin.bank_account.domain.model.BankAccountOverdraft;
 import fr.albin.bank_account.domain.model.SavingsAccount;
+import fr.albin.bank_account.domain.model.interfaces.BankAccountImpl;
 import fr.albin.bank_account.infrastructure.adapter.out.persistence.entity.BankAccountEntity;
 import fr.albin.bank_account.infrastructure.adapter.out.persistence.repository.BankAccountRepository;
 
@@ -32,7 +33,7 @@ public class BankAccountPersistenceAdapterTest {
         BankAccountOverdraft original = new BankAccountOverdraft("ACC-003", 100.0, 80.0);
 
         repository.save(new BankAccountEntity(original));
-        BankAccount reloaded = repository.findByAccountNumber("ACC-003").toBankAccount();
+        BankAccountImpl reloaded = repository.findByAccountNumber("ACC-003").toBankAccount();
 
         assertInstanceOf(BankAccountOverdraft.class, reloaded);
         assertEquals(100.0, reloaded.getBalance());
@@ -45,10 +46,10 @@ public class BankAccountPersistenceAdapterTest {
     @DisplayName("Devrait pouvoir recharger un compte avec un solde négatif (découvert)")
     void should_create_load_overdraft_account_negative_balance() {
         BankAccountOverdraft original = new BankAccountOverdraft("ACC-003", 100.0, 80.0);
-        original.withdraw(150.0); // Solde devient -50, dans la limite du découvert
+        original.withdraw(150.0);
 
         repository.save(new BankAccountEntity(original));
-        BankAccount reloaded = repository.findByAccountNumber("ACC-003").toBankAccount();
+        BankAccountImpl reloaded = repository.findByAccountNumber("ACC-003").toBankAccount();
 
         assertInstanceOf(BankAccountOverdraft.class, reloaded);
         assertEquals(-50.0, reloaded.getBalance());
@@ -62,10 +63,10 @@ public class BankAccountPersistenceAdapterTest {
         SavingsAccount sa = new SavingsAccount("ACC-004", 1200, 1500);
         repository.save(new BankAccountEntity(sa));
 
-        BankAccount reloaded = repository.findByAccountNumber("ACC-004").toBankAccount();
+        BankAccountImpl reloaded = repository.findByAccountNumber("ACC-004").toBankAccount();
         assertInstanceOf(SavingsAccount.class, reloaded);
         assertEquals(1200, reloaded.getBalance());
-        assertEquals(1500, ((SavingsAccount) reloaded).getDepositCap());
+        assertEquals(1500, reloaded.getDepositLimit());
         assertEquals(1, reloaded.getOperations().size());
 
     }
@@ -82,7 +83,7 @@ public class BankAccountPersistenceAdapterTest {
         BankAccountEntity found = repository.findByAccountNumber("ACC-001");
 
         assertNotNull(found);
-        BankAccount reloaded = found.toBankAccount();
+        BankAccountImpl reloaded = found.toBankAccount();
         assertEquals(120.0, reloaded.getBalance());
         assertEquals(3, reloaded.getOperations().size());
     }

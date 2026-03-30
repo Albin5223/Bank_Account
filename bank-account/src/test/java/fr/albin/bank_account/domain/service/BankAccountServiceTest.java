@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -16,12 +17,12 @@ import org.junit.jupiter.api.Test;
 import fr.albin.bank_account.domain.exception.DepositCapExceededException;
 import fr.albin.bank_account.domain.exception.InsufficientBalanceException;
 import fr.albin.bank_account.domain.exception.InvalidAmountException;
-import fr.albin.bank_account.domain.exception.OverdraftLimitExceededException;
 import fr.albin.bank_account.domain.model.AccountStatement;
 import fr.albin.bank_account.domain.model.BankAccount;
 import fr.albin.bank_account.domain.model.BankAccountOverdraft;
 import fr.albin.bank_account.domain.model.SavingsAccount;
 import fr.albin.bank_account.domain.model.enums.TypeAccount;
+import fr.albin.bank_account.domain.model.interfaces.BankAccountImpl;
 import fr.albin.bank_account.domain.port.out.GenerateAccountNumberPort;
 import fr.albin.bank_account.domain.port.out.LoadBankAccountPort;
 import fr.albin.bank_account.domain.port.out.SaveBankAccountPort;
@@ -39,7 +40,7 @@ class BankAccountServiceTest {
         String accountNumber = service.createBankAccount(100.0);
 
         assertEquals("ACC-001", accountNumber);
-        BankAccount created = accountStore.loadByAccountNumber("ACC-001").orElseThrow();
+        BankAccountImpl created = accountStore.loadByAccountNumber("ACC-001").orElseThrow();
         assertEquals(100.0, created.getBalance());
         assertEquals("ACC-001", created.getAccountNumber());
     }
@@ -54,7 +55,7 @@ class BankAccountServiceTest {
         String accountNumber = service.createSavingsAccount(200.0, 500.0);
 
         assertEquals("SAV-001", accountNumber);
-        BankAccount created = accountStore.loadByAccountNumber("SAV-001").orElseThrow();
+        BankAccountImpl created = accountStore.loadByAccountNumber("SAV-001").orElseThrow();
         assertInstanceOf(SavingsAccount.class, created);
         assertEquals(200.0, created.getBalance());
     }
@@ -69,7 +70,7 @@ class BankAccountServiceTest {
         String accountNumber = service.createBankAccountOverdraft(300.0, 250.0);
 
         assertEquals("OD-001", accountNumber);
-        BankAccount created = accountStore.loadByAccountNumber("OD-001").orElseThrow();
+        BankAccountImpl created = accountStore.loadByAccountNumber("OD-001").orElseThrow();
         assertInstanceOf(BankAccountOverdraft.class, created);
         assertEquals(300.0, created.getBalance());
     }
@@ -106,7 +107,7 @@ class BankAccountServiceTest {
         InMemoryAccountStore accountStore = new InMemoryAccountStore();
         BankAccountService service = new BankAccountService(new FixedAccountNumberGenerator("IGNORED"), accountStore, accountStore);
 
-        assertThrows(IllegalArgumentException.class, () -> service.depositMoney("UNKNOWN", 10.0));
+        assertThrows(NoSuchElementException.class, () -> service.depositMoney("UNKNOWN", 10.0));
     }
 
     @Test
@@ -115,7 +116,7 @@ class BankAccountServiceTest {
         InMemoryAccountStore accountStore = new InMemoryAccountStore();
         BankAccountService service = new BankAccountService(new FixedAccountNumberGenerator("IGNORED"), accountStore, accountStore);
 
-        assertThrows(IllegalArgumentException.class, () -> service.withdrawMoney("UNKNOWN", 10.0));
+        assertThrows(NoSuchElementException.class, () -> service.withdrawMoney("UNKNOWN", 10.0));
     }
 
     @Test
@@ -155,7 +156,7 @@ class BankAccountServiceTest {
         accountStore.save(new BankAccountOverdraft("OD-10", 20.0, 10.0));
         BankAccountService service = new BankAccountService(new FixedAccountNumberGenerator("IGNORED"), accountStore, accountStore);
 
-        assertThrows(OverdraftLimitExceededException.class, () -> service.withdrawMoney("OD-10", 40.0));
+        assertThrows(InsufficientBalanceException.class, () -> service.withdrawMoney("OD-10", 40.0));
     }
 
     @Test
@@ -178,15 +179,15 @@ class BankAccountServiceTest {
 
     private static final class InMemoryAccountStore implements LoadBankAccountPort, SaveBankAccountPort {
 
-        private final Map<String, BankAccount> accounts = new HashMap<>();
+        private final Map<String, BankAccountImpl> accounts = new HashMap<>();
 
         @Override
-        public Optional<BankAccount> loadByAccountNumber(String accountNumber) {
+        public Optional<BankAccountImpl> loadByAccountNumber(String accountNumber) {
             return Optional.ofNullable(accounts.get(accountNumber));
         }
 
         @Override
-        public void save(BankAccount account) {
+        public void save(BankAccountImpl account) {
             accounts.put(account.getAccountNumber(), account);
         }
     }
