@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.albin.bank_account.domain.exception.DepositCapExceededException;
-import fr.albin.bank_account.domain.exception.InsufficientBalanceException;
+import fr.albin.bank_account.domain.exception.InvalidAmountException;
 import fr.albin.bank_account.domain.model.enums.TypeAccount;
 import fr.albin.bank_account.domain.model.enums.TypeOperation;
 import fr.albin.bank_account.domain.model.interfaces.BankAccountImpl;
@@ -21,12 +21,16 @@ public class SavingsAccount implements BankAccountImpl {
     protected double depositCap;
     protected String accountNumber;
     protected double balance;
-    protected final List<Operation> operations = new java.util.ArrayList<>();
+    protected final List<Operation> operations = new ArrayList<>();
 
 
     public SavingsAccount(String number, double balance, double depositCap) {
-        if (depositCap < 0 || balance < 0) {
-            throw new InsufficientBalanceException("Le plafond de dépôt ne peut pas être négatif");
+        if(balance < 0) {
+            throw new InvalidAmountException("Le solde initial ne peut pas être négatif");
+        }
+        
+        if (depositCap < 0) {
+            throw new IllegalArgumentException("Le plafond de dépôt ne peut pas être négatif");
         }
         if(balance>depositCap){
             throw new DepositCapExceededException("Plafond dépassé lors de la création du compte");

@@ -21,15 +21,15 @@ public class BankAccountOverdraft implements BankAccountImpl {
     protected double overdraftLimit;
     protected String accountNumber;
     protected double balance;
-    protected final List<Operation> operations = new java.util.ArrayList<>();
+    protected final List<Operation> operations = new ArrayList<>();
     
 
     public BankAccountOverdraft(String number, double balance, double overdraftLimit) {
-        if (balance < -overdraftLimit) {
-            throw new InvalidAmountException("Le solde initial ne peut pas être inférieur à la limite de découvert");
-        }
         if (overdraftLimit < 0) {
             throw new InvalidAmountException("La limite de découvert ne peut pas être négative");
+        }
+        if (balance < -overdraftLimit) {
+            throw new InvalidAmountException("Le solde initial ne peut pas être inférieur à la limite de découvert");
         }
         this.overdraftLimit = overdraftLimit;
         this.accountNumber = number;

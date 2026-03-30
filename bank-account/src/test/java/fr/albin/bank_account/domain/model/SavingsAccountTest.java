@@ -35,7 +35,7 @@ class SavingsAccountTest {
     @DisplayName("Refuse la création d'un livret avec plafond négatif")
     void should_reject_negative_deposit_cap() {
         assertThrows(
-            InsufficientBalanceException.class,
+            IllegalArgumentException.class,
             () -> new SavingsAccount("123456", 1000.0, -1.0)
         );
     }
@@ -59,7 +59,7 @@ class SavingsAccountTest {
         String number = "123456";
         double balance = -500.0;
         assertThrows(
-            InsufficientBalanceException.class,
+            InvalidAmountException.class,
             () -> new SavingsAccount(number, balance,1600),
             "La création d'un compte avec un solde négatif devrait lever une exception"
         ); 

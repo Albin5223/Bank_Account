@@ -83,7 +83,7 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/createBankAccount")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isUnprocessableContent()); // 422
+                .andExpect(status().isUnprocessableContent());
     }
 
     @Test

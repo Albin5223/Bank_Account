@@ -103,24 +103,33 @@ public class BankAccountController {
         return ResponseEntity.noContent().build(); // 204
     }
 
-    // Erreurs de validation
+    /**
+     * Intercepter les erreurs de validation des requetes
+     */
     @ExceptionHandler({MethodArgumentNotValidException.class, HttpMessageNotReadableException.class})
     public ResponseEntity<String> handleValidationExceptions(Exception e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(buildErrorMessage(e));
     }
 
-    // Erreurs métier
+    /**
+     * Intercepter les erreurs métiers
+     */
     @ExceptionHandler({InvalidAmountException.class, InsufficientBalanceException.class, DepositCapExceededException.class})
     public ResponseEntity<String> handleBusinessExceptions(RuntimeException e) {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(buildErrorMessage(e));
     }
 
-    // Compte non trouvé
+    /**
+     * Intercepter les erreurs liées aux comptes non trouvés
+     */
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<String> handleNotFound(NoSuchElementException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(buildErrorMessage(e));
     }
 
+    /**
+     * Intercepter toutes les autres erreurs
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleUnexpectedExceptions(Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(buildErrorMessage(e));
