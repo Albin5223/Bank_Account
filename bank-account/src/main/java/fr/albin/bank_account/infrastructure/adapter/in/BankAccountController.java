@@ -1,9 +1,11 @@
 package fr.albin.bank_account.infrastructure.adapter.in;
 
 import java.net.URI;
+import java.util.NoSuchElementException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,8 +14,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 
+import fr.albin.bank_account.domain.exception.DepositCapExceededException;
+import fr.albin.bank_account.domain.exception.InsufficientBalanceException;
+import fr.albin.bank_account.domain.exception.InvalidAmountException;
 import fr.albin.bank_account.domain.model.AccountStatement;
 import fr.albin.bank_account.domain.port.in.CreateBankAccountOverdraftUseCase;
 import fr.albin.bank_account.domain.port.in.CreateBankAccountUseCase;
@@ -21,13 +25,13 @@ import fr.albin.bank_account.domain.port.in.CreateSavingsAccountUseCase;
 import fr.albin.bank_account.domain.port.in.DepositMoneyUseCase;
 import fr.albin.bank_account.domain.port.in.GetAccountStatementUseCase;
 import fr.albin.bank_account.domain.port.in.WithdrawMoneyUseCase;
-import fr.albin.bank_account.infrastructure.TDO.CreateBankAccountOverdraftRequest;
-import fr.albin.bank_account.infrastructure.TDO.CreateBankAccountRequest;
-import fr.albin.bank_account.infrastructure.TDO.CreateAccountResponse;
-import fr.albin.bank_account.infrastructure.TDO.CreateSavingsAccountRequest;
-import fr.albin.bank_account.infrastructure.TDO.DepositMoneyRequest;
-import fr.albin.bank_account.infrastructure.TDO.GetAccountStatementRequest;
-import fr.albin.bank_account.infrastructure.TDO.WithdrawMoneyRequest;
+import fr.albin.bank_account.infrastructure.DTO.CreateAccountResponse;
+import fr.albin.bank_account.infrastructure.DTO.CreateBankAccountOverdraftRequest;
+import fr.albin.bank_account.infrastructure.DTO.CreateBankAccountRequest;
+import fr.albin.bank_account.infrastructure.DTO.CreateSavingsAccountRequest;
+import fr.albin.bank_account.infrastructure.DTO.DepositMoneyRequest;
+import fr.albin.bank_account.infrastructure.DTO.GetAccountStatementRequest;
+import fr.albin.bank_account.infrastructure.DTO.WithdrawMoneyRequest;
 
 /**
  * Contrôleur REST pour la gestion des comptes bancaires. Cette classe expose des endpoints
@@ -60,78 +64,72 @@ public class BankAccountController {
     }
 
     @PostMapping("/createBankAccount")
-    public ResponseEntity<?> createBankAccount(@Validated @RequestBody CreateBankAccountRequest request) {
-        try {
-            String accountId = createBankAccountUseCase.createBankAccount(request.balance());
-            URI location = URI.create("/api/accounts/" + accountId);
-            return ResponseEntity.created(location).body(new CreateAccountResponse(accountId)); // 201
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
-        }
+    public ResponseEntity<CreateAccountResponse> createBankAccount(@Validated @RequestBody CreateBankAccountRequest request) {
+        String accountId = createBankAccountUseCase.createBankAccount(request.balance());
+        URI location = URI.create("/api/accounts/" + accountId);
+        return ResponseEntity.created(location).body(new CreateAccountResponse(accountId)); // 201
     }
 
     @PostMapping("/createSavingsAccount")
-    public ResponseEntity<?> createSavingsAccount(@Validated @RequestBody CreateSavingsAccountRequest request) {
-        try {
-            String accountId = createSavingsAccountUseCase.createSavingsAccount(request.balance(), request.depositCap());
-            URI location = URI.create("/api/accounts/" + accountId);
-            return ResponseEntity.created(location).body(new CreateAccountResponse(accountId)); // 201
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
-        }
+    public ResponseEntity<CreateAccountResponse> createSavingsAccount(@Validated @RequestBody CreateSavingsAccountRequest request) {
+        String accountId = createSavingsAccountUseCase.createSavingsAccount(request.balance(), request.depositCap());
+        URI location = URI.create("/api/accounts/" + accountId);
+        return ResponseEntity.created(location).body(new CreateAccountResponse(accountId)); // 201
     }
 
     @PostMapping("/createBankAccountOverdraft")
-    public ResponseEntity<?> createBankAccountOverdraft(@Validated @RequestBody CreateBankAccountOverdraftRequest request) {
-        try {
-            String accountId = createBankAccountOverdraftUseCase.createBankAccountOverdraft(request.balance(), request.overdraft());
-            URI location = URI.create("/api/accounts/" + accountId);
-            return ResponseEntity.created(location).body(new CreateAccountResponse(accountId)); // 201
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
-        }
+    public ResponseEntity<CreateAccountResponse> createBankAccountOverdraft(@Validated @RequestBody CreateBankAccountOverdraftRequest request) {
+        String accountId = createBankAccountOverdraftUseCase.createBankAccountOverdraft(request.balance(), request.overdraft());
+        URI location = URI.create("/api/accounts/" + accountId);
+        return ResponseEntity.created(location).body(new CreateAccountResponse(accountId)); // 201
     }
 
     @GetMapping("/accountStatement")
-    public ResponseEntity<?> getAccountStatement(@Validated @RequestBody GetAccountStatementRequest request) {
-        try {
-            AccountStatement accountStatement = getAccountStatementUseCase.getAccountStatement(request.accountNumber(),request.date());
-            return ResponseEntity.ok(accountStatement); // 200
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
-        }
+    public ResponseEntity<AccountStatement> getAccountStatement(@Validated @RequestBody GetAccountStatementRequest request) {
+        AccountStatement accountStatement = getAccountStatementUseCase.getAccountStatement(request.accountNumber(), request.date());
+        return ResponseEntity.ok(accountStatement); // 200
     }
 
 
     @PostMapping("/depositMoney")
-    public ResponseEntity<String> depositMoney(@Validated @RequestBody DepositMoneyRequest request) {
-        try {
-            depositMoneyUseCase.depositMoney(request.accountNumber(), request.amount());
-            return ResponseEntity.noContent().build(); // 204
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    public ResponseEntity<Void> depositMoney(@Validated @RequestBody DepositMoneyRequest request) {
+        depositMoneyUseCase.depositMoney(request.accountNumber(), request.amount());
+        return ResponseEntity.noContent().build(); // 204
     }
 
     @PostMapping("/withdrawMoney")
-    public ResponseEntity<String> withdrawMoney(@Validated @RequestBody WithdrawMoneyRequest request) {
-        try {
-            withdrawMoneyUseCase.withdrawMoney(request.accountNumber(), request.amount());
-            return ResponseEntity.noContent().build(); // 204
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
-        }
+    public ResponseEntity<Void> withdrawMoney(@Validated @RequestBody WithdrawMoneyRequest request) {
+        withdrawMoneyUseCase.withdrawMoney(request.accountNumber(), request.amount());
+        return ResponseEntity.noContent().build(); // 204
     }
 
-    //Pour attraper les erreurs avant l'éxécution des méthodes
+    // Erreurs de validation
     @ExceptionHandler({MethodArgumentNotValidException.class, HttpMessageNotReadableException.class})
     public ResponseEntity<String> handleValidationExceptions(Exception e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(buildErrorMessage(e));
     }
 
+    // Erreurs métier
+    @ExceptionHandler({InvalidAmountException.class, InsufficientBalanceException.class, DepositCapExceededException.class})
+    public ResponseEntity<String> handleBusinessExceptions(RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(buildErrorMessage(e));
+    }
 
+    // Compte non trouvé
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<String> handleNotFound(NoSuchElementException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(buildErrorMessage(e));
+    }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleUnexpectedExceptions(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(buildErrorMessage(e));
+    }
 
-    
-    
+    /**
+     * Méthode pour construire un message d'erreur
+     */
+    private String buildErrorMessage(Exception exception) {
+        return exception.getClass().getSimpleName() + " : " + exception.getMessage();
+    }
 }

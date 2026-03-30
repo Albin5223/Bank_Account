@@ -66,25 +66,25 @@ class SavingsAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait réfuser de créer un compte avec un solde < depositCap")
-    void should_not_create_account_with_balance_sup_depositCap() {
+    @DisplayName("Refuse la création d'un livret si le solde est strictement supérieur au plafond")
+    void should_not_create_account_with_balance_strictly_above_deposit_cap() {
         String number = "123456";
         double balance = 2500.0;
         assertThrows(
             DepositCapExceededException.class,
             () -> new SavingsAccount(number, balance,1600),
-            "La création d'un compte avec un solde négatif devrait lever une exception"
+            "La création d'un compte avec un solde supérieur au plafond devrait lever une exception"
         ); 
     }
 
     @Test
-    @DisplayName("Devrait réfuser de créer un compte avec un solde = depositCap")
-    void should_not_create_account_with_balance_eq_depositCap() {
+    @DisplayName("Accepte la création d'un livret avec un solde égal au plafond")
+    void should_create_account_with_balance_equal_to_deposit_cap() {
         String number = "123456";
         double balance = 2500.0;
         assertDoesNotThrow(
             () -> new SavingsAccount(number, balance,balance),
-            "La création d'un compte avec un solde négatif devrait lever une exception"
+            "La création d'un compte avec un solde égal au plafond ne devrait pas lever d'exception"
         ); 
     }
 
@@ -99,8 +99,8 @@ class SavingsAccountTest {
     }
 
     @Test
-    @DisplayName("Devrait déposer de l'argent sur le compte")
-    void should_deposit_money_eq_desiteCape(){
+    @DisplayName("Dépose de l'argent jusqu'au plafond exact")
+    void should_deposit_money_equal_to_deposit_cap(){
         SavingsAccount account = new SavingsAccount("123456", 1000.0,1600);
 
         account.deposit(600.0);
@@ -140,7 +140,7 @@ class SavingsAccountTest {
         assertThrows(
             DepositCapExceededException.class,
             () -> account.deposit(1500.0),
-            "Un dépot qui dépasse le plafond devrait lever une exception"
+            "Un dépôt qui dépasse le plafond devrait lever une exception"
         );
     }
 

@@ -1,4 +1,4 @@
-package fr.albin.bank_account.infrastructure.TDO;
+package fr.albin.bank_account.infrastructure.DTO;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

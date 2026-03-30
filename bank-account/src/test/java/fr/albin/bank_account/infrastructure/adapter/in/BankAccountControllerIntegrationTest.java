@@ -18,13 +18,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 
+import fr.albin.bank_account.infrastructure.DTO.CreateBankAccountOverdraftRequest;
+import fr.albin.bank_account.infrastructure.DTO.CreateBankAccountRequest;
+import fr.albin.bank_account.infrastructure.DTO.CreateSavingsAccountRequest;
+import fr.albin.bank_account.infrastructure.DTO.DepositMoneyRequest;
+import fr.albin.bank_account.infrastructure.DTO.GetAccountStatementRequest;
+import fr.albin.bank_account.infrastructure.DTO.WithdrawMoneyRequest;
 import fr.albin.bank_account.infrastructure.adapter.out.persistence.repository.BankAccountRepository;
-import fr.albin.bank_account.infrastructure.TDO.DepositMoneyRequest;
-import fr.albin.bank_account.infrastructure.TDO.GetAccountStatementRequest;
-import fr.albin.bank_account.infrastructure.TDO.WithdrawMoneyRequest;
-import fr.albin.bank_account.infrastructure.TDO.CreateBankAccountOverdraftRequest;
-import fr.albin.bank_account.infrastructure.TDO.CreateBankAccountRequest;
-import fr.albin.bank_account.infrastructure.TDO.CreateSavingsAccountRequest;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest
@@ -156,7 +156,7 @@ class BankAccountControllerIntegrationTest {
         mockMvc.perform(post("/api/accounts/withdrawMoney")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(withdrawRequest)))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isUnprocessableContent());
         GetAccountStatementRequest statementRequest = new GetAccountStatementRequest(
                 accountNumber,
                 LocalDateTime.now().plusDays(1));
@@ -201,6 +201,49 @@ class BankAccountControllerIntegrationTest {
                 .content(objectMapper.writeValueAsString(statementRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.balance").value(-10.0))
+                .andExpect(jsonPath("$.operations.length()").value(3));
+    }
+
+    @Test
+    @DisplayName("create -> deposit -> deposit -> deposit -> statement, le troisième dépot doit échouer et ne pas être persisté avec un compte épargne")
+    void should_not_persist_deposit_exceeding_cap_with_savings_account() throws Exception{
+        CreateSavingsAccountRequest createRequest = new CreateSavingsAccountRequest(100.0, 500.0);
+        MvcResult createResult = mockMvc.perform(post("/api/accounts/createSavingsAccount")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(createRequest)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.accountNumber").exists())
+                .andReturn();
+        String accountNumber = extractAccountNumberFromBody(createResult);
+
+        DepositMoneyRequest depositRequest = new DepositMoneyRequest(accountNumber, 200.0);
+        
+        mockMvc.perform(post("/api/accounts/depositMoney")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(depositRequest)))
+                .andExpect(status().isNoContent());
+        depositRequest = new DepositMoneyRequest(accountNumber, 200.0);
+
+        mockMvc.perform(post("/api/accounts/depositMoney")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(depositRequest)))
+                .andExpect(status().isNoContent());
+        depositRequest = new DepositMoneyRequest(accountNumber, 200.0);
+
+        mockMvc.perform(post("/api/accounts/depositMoney")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(depositRequest)))
+                .andExpect(status().isUnprocessableContent());
+
+        GetAccountStatementRequest statementRequest = new GetAccountStatementRequest(
+                accountNumber,
+                LocalDateTime.now().plusDays(1));
+
+        mockMvc.perform(get("/api/accounts/accountStatement")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(statementRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.balance").value(500.0))
                 .andExpect(jsonPath("$.operations.length()").value(3));
     }
 

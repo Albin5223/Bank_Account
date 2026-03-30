@@ -26,7 +26,7 @@ import fr.albin.bank_account.domain.exception.InvalidAmountException;
 import fr.albin.bank_account.domain.model.AccountStatement;
 import fr.albin.bank_account.domain.model.enums.TypeAccount;
 import fr.albin.bank_account.domain.port.in.*;
-import fr.albin.bank_account.infrastructure.TDO.*;
+import fr.albin.bank_account.infrastructure.DTO.*;
 import tools.jackson.databind.ObjectMapper;
 
 
@@ -83,7 +83,7 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/createBankAccount")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound()); // 404
+                .andExpect(status().isUnprocessableContent()); // 422
     }
 
     @Test
@@ -96,7 +96,7 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/createBankAccount")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound()); // 404
+                .andExpect(status().isBadRequest()); // 400
     }
 
     @Test
@@ -122,7 +122,7 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/createSavingsAccount")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound()); // 404
+                .andExpect(status().isBadRequest()); // 400
     }
 
     @Test
@@ -135,7 +135,7 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/createSavingsAccount")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound()); // 404
+                .andExpect(status().isInternalServerError()); // 500
     }
 
     @Test
@@ -161,7 +161,7 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/createBankAccountOverdraft")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound()); // 404
+                .andExpect(status().isBadRequest()); // 400
     }
 
     @Test
@@ -174,7 +174,7 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/createBankAccountOverdraft")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound()); // 404
+                .andExpect(status().isInternalServerError()); // 500
     }
 
     @Test
@@ -215,7 +215,7 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/depositMoney")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound()); // 404
+                .andExpect(status().isBadRequest()); // 400
     }
 
     @Test
@@ -253,7 +253,7 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/withdrawMoney")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound()); // 404
+                .andExpect(status().isBadRequest()); // 400
     }
 
     @Test
@@ -279,6 +279,6 @@ class BankAccountControllerTest {
         mockMvc.perform(post("/api/accounts/withdrawMoney")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound()); // 404
+                .andExpect(status().isUnprocessableContent()); // 422
     }
 }
