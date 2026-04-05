@@ -31,5 +31,8 @@
 /nbdist/
 /.nb-gradle/
 
+
+/backend/.mvn
+
 ##Autres 
 ARCHITECTURE.md
