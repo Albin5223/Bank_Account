@@ -33,10 +33,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image for backend
         uses: docker/build-push-action@v5 # Build and push Docker image
         with:
-          context: .
+          context: ./backend
           push: true
           tags: ghcr.io/albin5223/bank-account:${{ steps.version.outputs.VERSION }}
           build-args: VERSION=${{ steps.version.outputs.VERSION }}
