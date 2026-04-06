@@ -9,15 +9,15 @@ import fr.albin.bank_account.domain.model.AccountStatement;
 import fr.albin.bank_account.domain.model.BankAccountOverdraft;
 import fr.albin.bank_account.domain.model.BankAccountFactory;
 import fr.albin.bank_account.domain.model.interfaces.BankAccountImpl;
-import fr.albin.bank_account.domain.port.in.CreateBankAccountOverdraftUseCase;
-import fr.albin.bank_account.domain.port.in.CreateBankAccountUseCase;
-import fr.albin.bank_account.domain.port.in.CreateSavingsAccountUseCase;
-import fr.albin.bank_account.domain.port.in.DepositMoneyUseCase;
-import fr.albin.bank_account.domain.port.in.GetAccountStatementUseCase;
-import fr.albin.bank_account.domain.port.in.WithdrawMoneyUseCase;
-import fr.albin.bank_account.domain.port.out.GenerateAccountNumberPort;
-import fr.albin.bank_account.domain.port.out.LoadBankAccountPort;
-import fr.albin.bank_account.domain.port.out.SaveBankAccountPort;
+import fr.albin.bank_account.domain.port.in.bankAccountUseCase.CreateBankAccountOverdraftUseCase;
+import fr.albin.bank_account.domain.port.in.bankAccountUseCase.CreateBankAccountUseCase;
+import fr.albin.bank_account.domain.port.in.bankAccountUseCase.CreateSavingsAccountUseCase;
+import fr.albin.bank_account.domain.port.in.bankAccountUseCase.DepositMoneyUseCase;
+import fr.albin.bank_account.domain.port.in.bankAccountUseCase.GetAccountStatementUseCase;
+import fr.albin.bank_account.domain.port.in.bankAccountUseCase.WithdrawMoneyUseCase;
+import fr.albin.bank_account.domain.port.out.bankAccountPort.GenerateAccountNumberPort;
+import fr.albin.bank_account.domain.port.out.bankAccountPort.LoadBankAccountPort;
+import fr.albin.bank_account.domain.port.out.bankAccountPort.SaveBankAccountPort;
 
 /**
  * Service de domaine pour la gestion des comptes bancaires. Cette classe implémente les cas d'utilisation

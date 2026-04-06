@@ -3,7 +3,7 @@ package fr.albin.bank_account.infrastructure.adapter.out.persistence.adapter;
 import java.util.Optional;
 
 import fr.albin.bank_account.domain.model.interfaces.BankAccountImpl;
-import fr.albin.bank_account.domain.port.out.LoadBankAccountPort;
+import fr.albin.bank_account.domain.port.out.bankAccountPort.LoadBankAccountPort;
 import fr.albin.bank_account.infrastructure.adapter.out.persistence.entity.BankAccountEntity;
 import fr.albin.bank_account.infrastructure.adapter.out.persistence.repository.BankAccountRepository;
 

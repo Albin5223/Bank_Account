@@ -1,7 +1,7 @@
 package fr.albin.bank_account.infrastructure.adapter.out.persistence.adapter;
 
 import fr.albin.bank_account.domain.model.interfaces.BankAccountImpl;
-import fr.albin.bank_account.domain.port.out.SaveBankAccountPort;
+import fr.albin.bank_account.domain.port.out.bankAccountPort.SaveBankAccountPort;
 import fr.albin.bank_account.infrastructure.adapter.out.persistence.entity.BankAccountEntity;
 import fr.albin.bank_account.infrastructure.adapter.out.persistence.repository.BankAccountRepository;
 

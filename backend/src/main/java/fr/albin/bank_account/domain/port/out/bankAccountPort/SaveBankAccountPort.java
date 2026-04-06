@@ -1,4 +1,4 @@
-package fr.albin.bank_account.domain.port.out;
+package fr.albin.bank_account.domain.port.out.bankAccountPort;
 
 import fr.albin.bank_account.domain.model.interfaces.BankAccountImpl;
 

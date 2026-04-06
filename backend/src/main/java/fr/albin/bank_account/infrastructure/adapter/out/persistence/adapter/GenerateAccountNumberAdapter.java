@@ -1,9 +1,9 @@
 package fr.albin.bank_account.infrastructure.adapter.out.persistence.adapter;
 
 
-import fr.albin.bank_account.domain.port.out.GenerateAccountNumberPort;
-
 import org.springframework.stereotype.Component;
+
+import fr.albin.bank_account.domain.port.out.bankAccountPort.GenerateAccountNumberPort;
 /**
  * Implémentation de GenerateAccountNumberPort qui génère un numéro de compte aléatoire
  * avec un préfixe "ACC-" suivi de 12 chiffres.

@@ -1,0 +1,64 @@
+package fr.albin.bank_account.domain.model;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import fr.albin.bank_account.domain.model.enums.Role;
+import fr.albin.bank_account.domain.model.interfaces.BankAccountImpl;
+import lombok.Getter;
+
+/**
+ * Représente un utilisateur de l'application bancaire.
+ */
+@Getter
+public class User {
+    
+
+    private String username;
+    private String password; // Mot de passe haché
+    private String email;
+    private List<Role> role;
+
+    private List<BankAccountImpl> bankAccounts;
+
+    public User(String username, String password, String email, List<Role> role, List<BankAccountImpl> bankAccounts) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.role = role;
+        this.bankAccounts = bankAccounts;
+    }
+
+    public User(String username, String password, String email) {
+        this(username, password, email, new ArrayList<>(), new ArrayList<>());
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void addRole(Role role) {
+        this.role.add(role);
+    }
+
+    public void removeRole(Role role) {
+        this.role.remove(role);
+    }
+
+    public void addBankAccount(BankAccountImpl bankAccount) {
+        this.bankAccounts.add(bankAccount);
+    }
+
+    public void removeBankAccount(BankAccountImpl bankAccount) {
+        this.bankAccounts.remove(bankAccount);
+    }
+
+}

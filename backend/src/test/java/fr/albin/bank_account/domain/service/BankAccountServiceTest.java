@@ -23,9 +23,9 @@ import fr.albin.bank_account.domain.model.BankAccountOverdraft;
 import fr.albin.bank_account.domain.model.SavingsAccount;
 import fr.albin.bank_account.domain.model.enums.TypeAccount;
 import fr.albin.bank_account.domain.model.interfaces.BankAccountImpl;
-import fr.albin.bank_account.domain.port.out.GenerateAccountNumberPort;
-import fr.albin.bank_account.domain.port.out.LoadBankAccountPort;
-import fr.albin.bank_account.domain.port.out.SaveBankAccountPort;
+import fr.albin.bank_account.domain.port.out.bankAccountPort.GenerateAccountNumberPort;
+import fr.albin.bank_account.domain.port.out.bankAccountPort.LoadBankAccountPort;
+import fr.albin.bank_account.domain.port.out.bankAccountPort.SaveBankAccountPort;
 
 @DisplayName("BankAccountUseCaseService - tests applicatifs")
 class BankAccountServiceTest {

@@ -1,4 +1,4 @@
-package fr.albin.bank_account.domain.port.in;
+package fr.albin.bank_account.domain.port.in.bankAccountUseCase;
 
 /**
  * Interface qui permet de déposer de l'argent
