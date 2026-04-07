@@ -13,6 +13,8 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -43,6 +45,10 @@ public class BankAccountEntity {
 
     @OneToMany(mappedBy = "bankAccount", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<OperationEntity> operations = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
     protected BankAccountEntity() {
     }
@@ -80,6 +86,10 @@ public class BankAccountEntity {
 
     public double getDepositLimit() {
         return depositLimit;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
     }
 
 

@@ -17,7 +17,7 @@ public class User {
     private String username;
     private String password; // Mot de passe haché
     private String email;
-    private List<Role> role;
+    private List<Role> roles;
 
     private List<BankAccountImpl> bankAccounts;
 
@@ -25,7 +25,7 @@ public class User {
         this.username = username;
         this.password = password;
         this.email = email;
-        this.role = role;
+        this.roles = role;
         this.bankAccounts = bankAccounts;
     }
 
@@ -46,11 +46,15 @@ public class User {
     }
 
     public void addRole(Role role) {
-        this.role.add(role);
+        this.roles.add(role);
     }
 
     public void removeRole(Role role) {
-        this.role.remove(role);
+        this.roles.remove(role);
+    }
+
+    public List<Role> getRole(){
+        return new ArrayList<>(roles);
     }
 
     public void addBankAccount(BankAccountImpl bankAccount) {
@@ -59,6 +63,10 @@ public class User {
 
     public void removeBankAccount(BankAccountImpl bankAccount) {
         this.bankAccounts.remove(bankAccount);
+    }
+
+    public List<BankAccountImpl> getBankAccounts(){
+        return new ArrayList<>(bankAccounts);
     }
 
 }
