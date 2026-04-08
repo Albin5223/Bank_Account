@@ -23,11 +23,13 @@ public class LoadUserAdapter implements LoadUserPort {
 
     @Override
     public Optional<User> loadUserByEmail(String email) {
-        return userRepository.findByEmail(email).map(UserEntity::toUser);
+        return Optional.ofNullable(userRepository.findByEmail(email))
+                .map(UserEntity::toUser);
     }
 
     @Override
     public Optional<User> loadUserByUsername(String username) {
-        return userRepository.findByUsername(username).map(UserEntity::toUser);
+        return Optional.ofNullable(userRepository.findByUsername(username))
+                .map(UserEntity::toUser);
     }
 }

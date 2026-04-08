@@ -1,11 +1,11 @@
 package fr.albin.bank_account.infrastructure.adapter.out.persistence.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import fr.albin.bank_account.domain.model.User;
 import fr.albin.bank_account.domain.model.enums.Role;
+import fr.albin.bank_account.domain.model.interfaces.BankAccountImpl;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -71,12 +71,16 @@ public class UserEntity {
     
     
     public User toUser() {
+        List<BankAccountImpl> convertedAccounts = this.bankAccounts.stream()
+            .map(BankAccountEntity::toBankAccount)
+            .toList();
+        
         return new User(
             this.username,
             this.password,
             this.email,
             this.roles,
-            new ArrayList<>()
+            convertedAccounts
         );
     }
 

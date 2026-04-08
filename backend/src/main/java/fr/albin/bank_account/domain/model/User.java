@@ -22,6 +22,19 @@ public class User {
     private List<BankAccountImpl> bankAccounts;
 
     public User(String username, String password, String email, List<Role> role, List<BankAccountImpl> bankAccounts) {
+        if (username == null || username.isEmpty()) {
+            throw new IllegalArgumentException("Le nom d'utilisateur ne peut pas être vide.");
+        }
+        if (password == null || password.isEmpty()) {
+            throw new IllegalArgumentException("Le mot de passe ne peut pas être vide.");
+        }
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("L'email ne peut pas être vide.");
+        }
+        // Validation de l'email (format basique)
+        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            throw new IllegalArgumentException("L'email n'est pas dans un format valide.");
+        }
         this.username = username;
         this.password = password;
         this.email = email;
