@@ -1,5 +1,6 @@
 package fr.albin.bank_account.infrastructure.adapter.in;
 
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -9,12 +10,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyString;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
@@ -31,12 +34,16 @@ import fr.albin.bank_account.domain.port.in.bankAccountUseCase.CreateSavingsAcco
 import fr.albin.bank_account.domain.port.in.bankAccountUseCase.DepositMoneyUseCase;
 import fr.albin.bank_account.domain.port.in.bankAccountUseCase.GetAccountStatementUseCase;
 import fr.albin.bank_account.domain.port.in.bankAccountUseCase.WithdrawMoneyUseCase;
+import fr.albin.bank_account.domain.port.in.userUseCase.LoginUserUseCase;
+import fr.albin.bank_account.domain.port.in.userUseCase.RegisterUserUseCase;
 import fr.albin.bank_account.infrastructure.DTO.*;
+import fr.albin.bank_account.infrastructure.security.JwtService;
 import tools.jackson.databind.ObjectMapper;
 
 
-@WebMvcTest
+@WebMvcTest(BankAccountController.class) // Limite le contexte de test au contrôleur BankAccountController
 @AutoConfigureMockMvc
+@WithMockUser // Simule un utilisateur authentifié pour les tests
 @DisplayName("POST /api/accounts/create - contrat d'ouverture de compte")
 class BankAccountControllerTest {
 
@@ -63,6 +70,15 @@ class BankAccountControllerTest {
 
     @MockitoBean
     private WithdrawMoneyUseCase withdrawMoneyUseCase;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private LoginUserUseCase loginUserUseCase;
+
+    @MockitoBean
+    private RegisterUserUseCase registerUserUseCase;
 
 
     @Test

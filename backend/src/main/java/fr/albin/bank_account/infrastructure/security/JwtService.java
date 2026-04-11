@@ -32,12 +32,13 @@ public class JwtService implements GenerateTokenPort{
         .compact();               // génère le token en String
     }
 
+    //Récupérer la clé de signature à partir de la clé secrète
     private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // 2. Extraire le username d'un token
+    //Extraire le username d'un token
     public String extractUsername(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
@@ -47,7 +48,7 @@ public class JwtService implements GenerateTokenPort{
                 .getSubject();
     }
 
-    // 3. Valider un token
+    // Valider un token
     public boolean isTokenValid(String token, String username) {
         String extractedUsername = extractUsername(token);
         return extractedUsername.equals(username) && !isTokenExpired(token);
