@@ -21,6 +21,7 @@ public class BankAccountOverdraft implements BankAccountImpl {
     protected double overdraftLimit;
     protected String accountNumber;
     protected double balance;
+    protected User user;
     protected final List<Operation> operations = new ArrayList<>();
     
 
@@ -95,4 +96,5 @@ public class BankAccountOverdraft implements BankAccountImpl {
     public void clearOperations() {
         this.operations.clear();
     }
+
 }

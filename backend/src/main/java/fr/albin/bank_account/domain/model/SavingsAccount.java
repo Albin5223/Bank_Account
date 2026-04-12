@@ -21,6 +21,7 @@ public class SavingsAccount implements BankAccountImpl {
     protected double depositCap;
     protected String accountNumber;
     protected double balance;
+    protected User user;
     protected final List<Operation> operations = new ArrayList<>();
 
 
@@ -100,5 +101,4 @@ public class SavingsAccount implements BankAccountImpl {
         this.operations.clear();
     }
    
-    
 }

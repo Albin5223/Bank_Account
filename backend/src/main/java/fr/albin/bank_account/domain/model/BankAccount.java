@@ -20,6 +20,7 @@ public class BankAccount implements BankAccountImpl {
 
     protected String accountNumber;
     protected double balance;
+    protected User user;
     protected final List<Operation> operations;
 
     public BankAccount(String number, double balance){
@@ -81,4 +82,5 @@ public class BankAccount implements BankAccountImpl {
     public void clearOperations() {
         this.operations.clear();
     }
+
 }

@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -64,22 +65,28 @@ public class BankAccountController {
     }
 
     @PostMapping("/createBankAccount")
-    public ResponseEntity<CreateAccountResponse> createBankAccount(@Validated @RequestBody CreateBankAccountRequest request) {
-        String accountId = createBankAccountUseCase.createBankAccount(request.balance());
+    public ResponseEntity<CreateAccountResponse> createBankAccount(
+        @Validated @RequestBody CreateBankAccountRequest request, 
+        @AuthenticationPrincipal String username) {
+        String accountId = createBankAccountUseCase.createBankAccount(request.balance(), username);
         URI location = URI.create("/api/accounts/" + accountId);
         return ResponseEntity.created(location).body(new CreateAccountResponse(accountId)); // 201
     }
 
     @PostMapping("/createSavingsAccount")
-    public ResponseEntity<CreateAccountResponse> createSavingsAccount(@Validated @RequestBody CreateSavingsAccountRequest request) {
-        String accountId = createSavingsAccountUseCase.createSavingsAccount(request.balance(), request.depositCap());
+    public ResponseEntity<CreateAccountResponse> createSavingsAccount(
+        @Validated @RequestBody CreateSavingsAccountRequest request,
+        @AuthenticationPrincipal String username) {
+        String accountId = createSavingsAccountUseCase.createSavingsAccount(request.balance(), request.depositCap(), username);
         URI location = URI.create("/api/accounts/" + accountId);
         return ResponseEntity.created(location).body(new CreateAccountResponse(accountId)); // 201
     }
 
     @PostMapping("/createBankAccountOverdraft")
-    public ResponseEntity<CreateAccountResponse> createBankAccountOverdraft(@Validated @RequestBody CreateBankAccountOverdraftRequest request) {
-        String accountId = createBankAccountOverdraftUseCase.createBankAccountOverdraft(request.balance(), request.overdraft());
+    public ResponseEntity<CreateAccountResponse> createBankAccountOverdraft(
+        @Validated @RequestBody CreateBankAccountOverdraftRequest request,
+        @AuthenticationPrincipal String username) {
+        String accountId = createBankAccountOverdraftUseCase.createBankAccountOverdraft(request.balance(), request.overdraft(), username);
         URI location = URI.create("/api/accounts/" + accountId);
         return ResponseEntity.created(location).body(new CreateAccountResponse(accountId)); // 201
     }

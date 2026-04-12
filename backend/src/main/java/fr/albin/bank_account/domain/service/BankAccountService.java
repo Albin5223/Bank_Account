@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import fr.albin.bank_account.domain.model.AccountStatement;
 import fr.albin.bank_account.domain.model.BankAccountOverdraft;
+import fr.albin.bank_account.domain.model.User;
 import fr.albin.bank_account.domain.model.BankAccountFactory;
 import fr.albin.bank_account.domain.model.interfaces.BankAccountImpl;
 import fr.albin.bank_account.domain.port.in.bankAccountUseCase.CreateBankAccountOverdraftUseCase;
@@ -18,6 +19,8 @@ import fr.albin.bank_account.domain.port.in.bankAccountUseCase.WithdrawMoneyUseC
 import fr.albin.bank_account.domain.port.out.bankAccountPort.GenerateAccountNumberPort;
 import fr.albin.bank_account.domain.port.out.bankAccountPort.LoadBankAccountPort;
 import fr.albin.bank_account.domain.port.out.bankAccountPort.SaveBankAccountPort;
+import fr.albin.bank_account.domain.port.out.userPort.LoadUserPort;
+import fr.albin.bank_account.domain.port.out.userPort.SaveUserPort;
 
 /**
  * Service de domaine pour la gestion des comptes bancaires. Cette classe implémente les cas d'utilisation
@@ -36,38 +39,53 @@ public class BankAccountService implements
     private final GenerateAccountNumberPort generateAccountNumberPort;
     private final LoadBankAccountPort loadBankAccountPort;
     private final SaveBankAccountPort saveBankAccountPort;
+    private final LoadUserPort loadUserPort;
+    private final SaveUserPort saveUserPort;
 
     public BankAccountService(
         GenerateAccountNumberPort generateAccountNumberPort,
         LoadBankAccountPort loadBankAccountPort,
-        SaveBankAccountPort saveBankAccountPort
+        SaveBankAccountPort saveBankAccountPort,
+        LoadUserPort loadUserPort,
+        SaveUserPort saveUserPort
     ) {
         this.generateAccountNumberPort = generateAccountNumberPort;
         this.loadBankAccountPort = loadBankAccountPort;
         this.saveBankAccountPort = saveBankAccountPort;
+        this.loadUserPort = loadUserPort;
+        this.saveUserPort = saveUserPort;
     }
 
     @Override
-    public String createBankAccount(double balance) {
+    public String createBankAccount(double balance, String user) {
+        User currentUser = loadUserOrThrow(user);
         String accountNumber = generateAccountNumberPort.generateAccountNumber();
         BankAccountImpl account = BankAccountFactory.createStandard(accountNumber, balance);
+        currentUser.addBankAccount(account);
         saveBankAccountPort.save(account);
+        saveUserPort.save(currentUser);
         return accountNumber;
     }
 
     @Override
-    public String createSavingsAccount(double balance, double depositCap) {
+    public String createSavingsAccount(double balance, double depositCap, String user) {
+        User currentUser = loadUserOrThrow(user);
         String accountNumber = generateAccountNumberPort.generateAccountNumber();
         BankAccountImpl account = BankAccountFactory.createSavings(accountNumber, balance, depositCap);
+        currentUser.addBankAccount(account);
         saveBankAccountPort.save(account);
+        saveUserPort.save(currentUser);
         return accountNumber;
     }
 
     @Override
-    public String createBankAccountOverdraft(double balance, double overdraft) {
+    public String createBankAccountOverdraft(double balance, double overdraft, String user) {
+        User currentUser = loadUserOrThrow(user);
         String accountNumber = generateAccountNumberPort.generateAccountNumber();
         BankAccountOverdraft account = BankAccountFactory.createOverdraft(accountNumber, balance, overdraft);
+        currentUser.addBankAccount(account);
         saveBankAccountPort.save(account);
+        saveUserPort.save(currentUser);
         return accountNumber;
     }
 
@@ -97,5 +115,11 @@ public class BankAccountService implements
         return loadBankAccountPort
             .loadByAccountNumber(accountNumber)
             .orElseThrow(() -> new NoSuchElementException("Compte introuvable : " + accountNumber));
+    }
+
+    private User loadUserOrThrow(String username) {
+        return loadUserPort
+            .loadUserByUsername(username)
+            .orElseThrow(() -> new NoSuchElementException("Utilisateur introuvable : " + username));
     }
 }

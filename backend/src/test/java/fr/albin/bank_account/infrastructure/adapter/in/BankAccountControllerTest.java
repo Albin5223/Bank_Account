@@ -1,6 +1,5 @@
 package fr.albin.bank_account.infrastructure.adapter.in;
 
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -9,17 +8,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.nullable;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.List;
@@ -34,17 +33,14 @@ import fr.albin.bank_account.domain.port.in.bankAccountUseCase.CreateSavingsAcco
 import fr.albin.bank_account.domain.port.in.bankAccountUseCase.DepositMoneyUseCase;
 import fr.albin.bank_account.domain.port.in.bankAccountUseCase.GetAccountStatementUseCase;
 import fr.albin.bank_account.domain.port.in.bankAccountUseCase.WithdrawMoneyUseCase;
-import fr.albin.bank_account.domain.port.in.userUseCase.LoginUserUseCase;
-import fr.albin.bank_account.domain.port.in.userUseCase.RegisterUserUseCase;
 import fr.albin.bank_account.infrastructure.DTO.*;
 import fr.albin.bank_account.infrastructure.security.JwtService;
 import tools.jackson.databind.ObjectMapper;
 
 
 @WebMvcTest(BankAccountController.class) // Limite le contexte de test au contrôleur BankAccountController
-@AutoConfigureMockMvc
-@WithMockUser // Simule un utilisateur authentifié pour les tests
-@DisplayName("POST /api/accounts/create - contrat d'ouverture de compte")
+@AutoConfigureMockMvc(addFilters = false) // Configure MockMvc pour les tests d'API, désactive les filtres de sécurité pour simplifier les tests
+@DisplayName("Test /api/accounts/ - BankAccountController")
 class BankAccountControllerTest {
 
     @Autowired
@@ -74,18 +70,12 @@ class BankAccountControllerTest {
     @MockitoBean
     private JwtService jwtService;
 
-    @MockitoBean
-    private LoginUserUseCase loginUserUseCase;
-
-    @MockitoBean
-    private RegisterUserUseCase registerUserUseCase;
-
 
     @Test
     @DisplayName("Teste l'endpoint qui permet de créer un compte - Devrait terminer en succès")
     void testCreateBankAccount_Success() throws Exception {
         CreateBankAccountRequest request = new CreateBankAccountRequest(1000.00);
-        when(createBankAccountUseCase.createBankAccount(anyDouble())).thenReturn("ACC-001");
+                when(createBankAccountUseCase.createBankAccount(anyDouble(), nullable(String.class))).thenReturn("ACC-001");
 
         mockMvc.perform(post("/api/accounts/createBankAccount")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -98,7 +88,7 @@ class BankAccountControllerTest {
     @DisplayName("Teste l'endpoint qui permet de créer un compte - Devrait terminer en erreur")
     void testCreateBankAccount_error() throws Exception {
         CreateBankAccountRequest request = new CreateBankAccountRequest(1000.00);
-        when(createBankAccountUseCase.createBankAccount(anyDouble()))
+                when(createBankAccountUseCase.createBankAccount(anyDouble(), nullable(String.class)))
                 .thenThrow(new InsufficientBalanceException("Solde insuffisant"));
 
         mockMvc.perform(post("/api/accounts/createBankAccount")
@@ -111,7 +101,7 @@ class BankAccountControllerTest {
     @DisplayName("Teste l'endpoint qui permet de créer un compte - Devrait terminer en erreur à cause ")
     void testCreateBankAccount_error_InvalideArgument() throws Exception {
         CreateBankAccountRequest request = new CreateBankAccountRequest(-1000.00);
-        when(createBankAccountUseCase.createBankAccount(anyDouble()))
+                when(createBankAccountUseCase.createBankAccount(anyDouble(), nullable(String.class)))
                 .thenThrow(new InsufficientBalanceException("Solde insuffisant"));
 
         mockMvc.perform(post("/api/accounts/createBankAccount")
@@ -124,7 +114,7 @@ class BankAccountControllerTest {
     @DisplayName("Teste l'endpoint qui permet de créer un compte épargne - Devrait terminer en succès")
     void testCreateSavingsAccount_Success() throws Exception {
         CreateSavingsAccountRequest request = new CreateSavingsAccountRequest(1000.00, 5000.00);
-        when(createSavingsAccountUseCase.createSavingsAccount(anyDouble(), anyDouble())).thenReturn("SAV-001");
+                when(createSavingsAccountUseCase.createSavingsAccount(anyDouble(), anyDouble(), nullable(String.class))).thenReturn("SAV-001");
 
         mockMvc.perform(post("/api/accounts/createSavingsAccount")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -137,7 +127,7 @@ class BankAccountControllerTest {
     @DisplayName("Teste l'endpoint qui permet de créer un compte épargne - Devrait terminer en erreur d'argument invalide")
     void testCreateSavingsAccount_error_InvalidArgument() throws Exception {
         CreateSavingsAccountRequest request = new CreateSavingsAccountRequest(-1000.00, 5000.00);
-        when(createSavingsAccountUseCase.createSavingsAccount(anyDouble(), anyDouble()))
+                when(createSavingsAccountUseCase.createSavingsAccount(anyDouble(), anyDouble(), nullable(String.class)))
                 .thenThrow(new IllegalArgumentException("Solde doit être positif"));
 
         mockMvc.perform(post("/api/accounts/createSavingsAccount")
@@ -150,7 +140,7 @@ class BankAccountControllerTest {
     @DisplayName("Teste l'endpoint qui permet de créer un compte épargne - Devrait terminer en erreur de conflit")
     void testCreateSavingsAccount_error_Conflict() throws Exception {
         CreateSavingsAccountRequest request = new CreateSavingsAccountRequest(1000.00, 5000.00);
-        when(createSavingsAccountUseCase.createSavingsAccount(anyDouble(), anyDouble()))
+                when(createSavingsAccountUseCase.createSavingsAccount(anyDouble(), anyDouble(), nullable(String.class)))
                 .thenThrow(new IllegalStateException("Compte déjà existant"));
 
         mockMvc.perform(post("/api/accounts/createSavingsAccount")
@@ -163,7 +153,7 @@ class BankAccountControllerTest {
     @DisplayName("Teste l'endpoint qui permet de créer un compte avec découvert - Devrait terminer en succès")
     void testCreateBankAccountOverdraft_Success() throws Exception {
         CreateBankAccountOverdraftRequest request = new CreateBankAccountOverdraftRequest(1000.00, 500.00);
-        when(createBankAccountOverdraftUseCase.createBankAccountOverdraft(anyDouble(), anyDouble())).thenReturn("OVD-001");
+                when(createBankAccountOverdraftUseCase.createBankAccountOverdraft(anyDouble(), anyDouble(), nullable(String.class))).thenReturn("OVD-001");
 
         mockMvc.perform(post("/api/accounts/createBankAccountOverdraft")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -176,7 +166,7 @@ class BankAccountControllerTest {
     @DisplayName("Teste l'endpoint qui permet de créer un compte avec découvert - Devrait terminer en erreur d'argument invalide")
     void testCreateBankAccountOverdraft_error_InvalidArgument() throws Exception {
         CreateBankAccountOverdraftRequest request = new CreateBankAccountOverdraftRequest(-1000.00, 500.00);
-        when(createBankAccountOverdraftUseCase.createBankAccountOverdraft(anyDouble(), anyDouble()))
+                when(createBankAccountOverdraftUseCase.createBankAccountOverdraft(anyDouble(), anyDouble(), nullable(String.class)))
                 .thenThrow(new IllegalArgumentException("Solde doit être positif"));
 
         mockMvc.perform(post("/api/accounts/createBankAccountOverdraft")
@@ -189,7 +179,7 @@ class BankAccountControllerTest {
     @DisplayName("Teste l'endpoint qui permet de créer un compte avec découvert - Devrait terminer en erreur de conflit")
     void testCreateBankAccountOverdraft_error_Conflict() throws Exception {
         CreateBankAccountOverdraftRequest request = new CreateBankAccountOverdraftRequest(1000.00, 500.00);
-        when(createBankAccountOverdraftUseCase.createBankAccountOverdraft(anyDouble(), anyDouble()))
+                when(createBankAccountOverdraftUseCase.createBankAccountOverdraft(anyDouble(), anyDouble(), nullable(String.class)))
                 .thenThrow(new IllegalStateException("Compte déjà existant"));
 
         mockMvc.perform(post("/api/accounts/createBankAccountOverdraft")
@@ -302,4 +292,4 @@ class BankAccountControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnprocessableContent()); // 422
     }
-}
+}	

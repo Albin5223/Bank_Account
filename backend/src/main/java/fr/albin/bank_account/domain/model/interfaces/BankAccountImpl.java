@@ -47,6 +47,7 @@ public interface BankAccountImpl {
      */
     public List<Operation> getOperations();
 
+
     /**
      * Méthode qui permet d'ajouter une opération à la liste des opérations
      */
