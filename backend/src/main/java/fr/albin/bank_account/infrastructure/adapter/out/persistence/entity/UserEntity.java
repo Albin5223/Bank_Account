@@ -1,5 +1,6 @@
 package fr.albin.bank_account.infrastructure.adapter.out.persistence.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,9 +53,10 @@ public class UserEntity {
         this.email = user.getEmail();
         this.password = user.getPassword();
 
-        this.roles = user.getRoles().stream().toList();
+        this.roles = new ArrayList<>(user.getRoles().stream().toList());
 
-        this.bankAccounts = user.getBankAccounts().stream().map(BankAccountEntity::new).toList();
+        this.bankAccounts = new ArrayList<>(user.getBankAccounts().stream().map(BankAccountEntity::new).toList());
+
     }
 
     public String getUsername() {
@@ -79,8 +81,8 @@ public class UserEntity {
             this.username,
             this.password,
             this.email,
-            this.roles,
-            convertedAccounts
+            new ArrayList<>(this.roles),
+            new ArrayList<>(convertedAccounts)
         );
     }
 

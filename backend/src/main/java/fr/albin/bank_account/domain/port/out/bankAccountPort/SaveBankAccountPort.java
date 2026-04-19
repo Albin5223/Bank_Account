@@ -8,4 +8,8 @@ import fr.albin.bank_account.domain.model.interfaces.BankAccountImpl;
  */
 public interface SaveBankAccountPort {
     void save(BankAccountImpl account);
+
+    default void save(BankAccountImpl account, String username) {
+        save(account);
+    }
 }

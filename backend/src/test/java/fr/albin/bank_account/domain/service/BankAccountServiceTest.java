@@ -50,7 +50,7 @@ class BankAccountServiceTest {
     @BeforeAll
     static void setup(){
         userStore.save(new User(username, password,email));
-        service = new BankAccountService(generator, accountStore, accountStore, userStore, userStore);
+        service = new BankAccountService(generator, accountStore, accountStore, userStore);
     }
     
     /**

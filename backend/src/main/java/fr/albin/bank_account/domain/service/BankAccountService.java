@@ -20,7 +20,6 @@ import fr.albin.bank_account.domain.port.out.bankAccountPort.GenerateAccountNumb
 import fr.albin.bank_account.domain.port.out.bankAccountPort.LoadBankAccountPort;
 import fr.albin.bank_account.domain.port.out.bankAccountPort.SaveBankAccountPort;
 import fr.albin.bank_account.domain.port.out.userPort.LoadUserPort;
-import fr.albin.bank_account.domain.port.out.userPort.SaveUserPort;
 
 /**
  * Service de domaine pour la gestion des comptes bancaires. Cette classe implémente les cas d'utilisation
@@ -40,52 +39,43 @@ public class BankAccountService implements
     private final LoadBankAccountPort loadBankAccountPort;
     private final SaveBankAccountPort saveBankAccountPort;
     private final LoadUserPort loadUserPort;
-    private final SaveUserPort saveUserPort;
 
     public BankAccountService(
         GenerateAccountNumberPort generateAccountNumberPort,
         LoadBankAccountPort loadBankAccountPort,
         SaveBankAccountPort saveBankAccountPort,
-        LoadUserPort loadUserPort,
-        SaveUserPort saveUserPort
+        LoadUserPort loadUserPort
     ) {
         this.generateAccountNumberPort = generateAccountNumberPort;
         this.loadBankAccountPort = loadBankAccountPort;
         this.saveBankAccountPort = saveBankAccountPort;
         this.loadUserPort = loadUserPort;
-        this.saveUserPort = saveUserPort;
     }
 
     @Override
     public String createBankAccount(double balance, String user) {
-        User currentUser = loadUserOrThrow(user);
+        loadUserOrThrow(user);
         String accountNumber = generateAccountNumberPort.generateAccountNumber();
         BankAccountImpl account = BankAccountFactory.createStandard(accountNumber, balance);
-        currentUser.addBankAccount(account);
-        saveBankAccountPort.save(account);
-        saveUserPort.save(currentUser);
+        saveBankAccountPort.save(account, user);
         return accountNumber;
     }
 
     @Override
     public String createSavingsAccount(double balance, double depositCap, String user) {
-        User currentUser = loadUserOrThrow(user);
+        loadUserOrThrow(user);
         String accountNumber = generateAccountNumberPort.generateAccountNumber();
         BankAccountImpl account = BankAccountFactory.createSavings(accountNumber, balance, depositCap);
-        currentUser.addBankAccount(account);
-        saveBankAccountPort.save(account);
-        saveUserPort.save(currentUser);
+        saveBankAccountPort.save(account, user);
         return accountNumber;
     }
 
     @Override
     public String createBankAccountOverdraft(double balance, double overdraft, String user) {
-        User currentUser = loadUserOrThrow(user);
+        loadUserOrThrow(user);
         String accountNumber = generateAccountNumberPort.generateAccountNumber();
         BankAccountOverdraft account = BankAccountFactory.createOverdraft(accountNumber, balance, overdraft);
-        currentUser.addBankAccount(account);
-        saveBankAccountPort.save(account);
-        saveUserPort.save(currentUser);
+        saveBankAccountPort.save(account, user);
         return accountNumber;
     }
 

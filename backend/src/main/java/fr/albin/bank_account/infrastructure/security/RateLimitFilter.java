@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * Filtre de sécurité pour limiter le nombre de requêtes d'une même IP sur une période donnée.
  * (Implémentation à venir)
  */
-@Component
+//@Component
 public class RateLimitFilter extends OncePerRequestFilter{
 
     @Override
