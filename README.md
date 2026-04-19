@@ -157,6 +157,10 @@ curl -i -X GET http://localhost:8080/api/accounts/accountStatement \
 ### URL du Swagger
 - http://localhost:8080/swagger-ui/index.html
 
+### TODO 
+- Faire en sorte que les admins peuvent récupérer tous les users et leurs comptes
+- Faire en sorte que les admins peuvent changer leur rôle
+
 
 
  
