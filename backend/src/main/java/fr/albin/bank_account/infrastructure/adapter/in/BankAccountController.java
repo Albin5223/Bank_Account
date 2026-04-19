@@ -1,6 +1,7 @@
 package fr.albin.bank_account.infrastructure.adapter.in;
 
 import java.net.URI;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.http.HttpStatus;
@@ -20,12 +21,15 @@ import fr.albin.bank_account.domain.exception.DepositCapExceededException;
 import fr.albin.bank_account.domain.exception.InsufficientBalanceException;
 import fr.albin.bank_account.domain.exception.InvalidAmountException;
 import fr.albin.bank_account.domain.model.AccountStatement;
+import fr.albin.bank_account.domain.model.User;
 import fr.albin.bank_account.domain.port.in.bankAccountUseCase.CreateBankAccountOverdraftUseCase;
 import fr.albin.bank_account.domain.port.in.bankAccountUseCase.CreateBankAccountUseCase;
 import fr.albin.bank_account.domain.port.in.bankAccountUseCase.CreateSavingsAccountUseCase;
 import fr.albin.bank_account.domain.port.in.bankAccountUseCase.DepositMoneyUseCase;
 import fr.albin.bank_account.domain.port.in.bankAccountUseCase.GetAccountStatementUseCase;
 import fr.albin.bank_account.domain.port.in.bankAccountUseCase.WithdrawMoneyUseCase;
+import fr.albin.bank_account.domain.port.in.userUseCase.GetUserInfoUseCase;
+import fr.albin.bank_account.infrastructure.DTO.AccountInformation;
 import fr.albin.bank_account.infrastructure.DTO.CreateAccountResponse;
 import fr.albin.bank_account.infrastructure.DTO.CreateBankAccountOverdraftRequest;
 import fr.albin.bank_account.infrastructure.DTO.CreateBankAccountRequest;
@@ -48,6 +52,7 @@ public class BankAccountController {
     private final DepositMoneyUseCase depositMoneyUseCase;
     private final GetAccountStatementUseCase getAccountStatementUseCase;
     private final WithdrawMoneyUseCase withdrawMoneyUseCase;
+    private final GetUserInfoUseCase getUserInfoUseCase;
 
     public BankAccountController(
             CreateBankAccountUseCase createBankAccount,
@@ -55,13 +60,15 @@ public class BankAccountController {
             CreateSavingsAccountUseCase createSavingsAccountUseCase,
             DepositMoneyUseCase depositMoney,
             GetAccountStatementUseCase getAccountStatement,
-            WithdrawMoneyUseCase withdrawMoney) {
+            WithdrawMoneyUseCase withdrawMoney,
+            GetUserInfoUseCase getUserInfoUseCase) {
         this.createBankAccountUseCase = createBankAccount;
         this.createBankAccountOverdraftUseCase = createBankAccountOverdraft;
         this.createSavingsAccountUseCase = createSavingsAccountUseCase;
         this.depositMoneyUseCase = depositMoney;
         this.getAccountStatementUseCase = getAccountStatement;
         this.withdrawMoneyUseCase = withdrawMoney;
+        this.getUserInfoUseCase = getUserInfoUseCase;
     }
 
     @PostMapping("/createBankAccount")
@@ -95,6 +102,24 @@ public class BankAccountController {
     public ResponseEntity<AccountStatement> getAccountStatement(@Validated @RequestBody GetAccountStatementRequest request) {
         AccountStatement accountStatement = getAccountStatementUseCase.getAccountStatement(request.accountNumber(), request.date());
         return ResponseEntity.ok(accountStatement); // 200
+    }
+
+    @GetMapping("/allAccounts")
+    public ResponseEntity<List<AccountInformation>> getAllAccountsForUser(@AuthenticationPrincipal String username) {
+        try{
+            User user = getUserInfoUseCase.getUserInfo(username);
+            List<AccountInformation> accountInformations = user.getBankAccounts().stream()
+                .map(account -> new AccountInformation(
+                    account.getAccountNumber(),
+                    account.getBalance(),
+                    account.getOverdraftLimit(),
+                    account.getDepositLimit(),
+                    account.getAccountType()
+                )).toList();
+            return ResponseEntity.ok(accountInformations);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
 

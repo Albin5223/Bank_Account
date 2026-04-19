@@ -8,11 +8,16 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
 @ConditionalOnWebApplication
+@OpenAPIDefinition(
+    security = @SecurityRequirement(name = "bearerAuth")
+)
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
@@ -31,6 +36,7 @@ public class SecurityConfig {
             // 2. Règles d'accès
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                 .anyRequest().authenticated()
             )
             

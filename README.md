@@ -153,9 +153,10 @@ curl -i -X GET http://localhost:8080/api/accounts/accountStatement \
 	-d '{"accountNumber":"ACC-833155830088","date":"2026-03-29T17:00:00"}'
 ```
 
-### TODO 
-- Faire un swagger
-- Tester la couche de sécurité
+
+### URL du Swagger
+- http://localhost:8080/swagger-ui/index.html
+
 
 
  

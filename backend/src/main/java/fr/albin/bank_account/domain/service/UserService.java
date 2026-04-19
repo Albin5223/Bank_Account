@@ -1,10 +1,13 @@
 package fr.albin.bank_account.domain.service;
 
+import java.util.NoSuchElementException;
+
 import org.springframework.stereotype.Service;
 
 import fr.albin.bank_account.domain.exception.InvalidCredential;
 import fr.albin.bank_account.domain.exception.UserAlreadyExistst;
 import fr.albin.bank_account.domain.model.User;
+import fr.albin.bank_account.domain.port.in.userUseCase.GetUserInfoUseCase;
 import fr.albin.bank_account.domain.port.in.userUseCase.LoginUserUseCase;
 import fr.albin.bank_account.domain.port.in.userUseCase.RegisterUserUseCase;
 import fr.albin.bank_account.domain.port.out.userPort.EncodePasswordPort;
@@ -13,7 +16,7 @@ import fr.albin.bank_account.domain.port.out.userPort.LoadUserPort;
 import fr.albin.bank_account.domain.port.out.userPort.SaveUserPort;
 
 @Service
-public class UserService implements RegisterUserUseCase, LoginUserUseCase {
+public class UserService implements RegisterUserUseCase, LoginUserUseCase, GetUserInfoUseCase {
 
     private final LoadUserPort loadUserPort;
     private final SaveUserPort saveUserPort;
@@ -54,6 +57,12 @@ public class UserService implements RegisterUserUseCase, LoginUserUseCase {
         var user = new User(username, encodedPassword, email);
         saveUserPort.save(user);
         return generateTokenPort.generateToken(user);
+    }
+
+    @Override
+    public User getUserInfo(String username) {
+        return loadUserPort.loadUserByUsername(username)
+            .orElseThrow(() -> new NoSuchElementException("User not found"));
     }
     
 }

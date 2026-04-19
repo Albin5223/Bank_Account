@@ -33,6 +33,7 @@ import fr.albin.bank_account.domain.port.in.bankAccountUseCase.CreateSavingsAcco
 import fr.albin.bank_account.domain.port.in.bankAccountUseCase.DepositMoneyUseCase;
 import fr.albin.bank_account.domain.port.in.bankAccountUseCase.GetAccountStatementUseCase;
 import fr.albin.bank_account.domain.port.in.bankAccountUseCase.WithdrawMoneyUseCase;
+import fr.albin.bank_account.domain.port.in.userUseCase.GetUserInfoUseCase;
 import fr.albin.bank_account.infrastructure.DTO.*;
 import fr.albin.bank_account.infrastructure.security.JwtService;
 import tools.jackson.databind.ObjectMapper;
@@ -66,6 +67,9 @@ class BankAccountControllerTest {
 
     @MockitoBean
     private WithdrawMoneyUseCase withdrawMoneyUseCase;
+
+    @MockitoBean
+    private GetUserInfoUseCase getUserInfoUseCase;
 
     @MockitoBean
     private JwtService jwtService;
